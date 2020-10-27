@@ -9,7 +9,7 @@ $factory->define(ToDo::class, function (Faker $faker) {
     $dueDate = rand(0, 10) <= 5 ? $faker->dateTimeBetween('now', '+5 months') : null;
 
     return [
-        'title'     => $faker->sentence(rand(0, 6)),
+        'title'     => $faker->sentence(rand(2, 6)),
         'body'      => $faker->sentence(rand(5, 15)),
         'due_date'  => $dueDate,
         'remind_at' => rand(0, 10) <= 5 ? $faker->dateTimeBetween('now', $dueDate) : null,
