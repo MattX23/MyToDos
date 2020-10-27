@@ -1,5 +1,6 @@
 <?php
 
+use App\ToDo;
 use App\User;
 use Illuminate\Database\Seeder;
 
@@ -13,7 +14,7 @@ class UserSeeder extends Seeder
     public function run()
     {
         factory(User::class, 5)->create()->each(function(User $user) {
-            // todo add todos
+            $user->toDos()->save(factory(ToDo::class)->make());
         });
     }
 }
