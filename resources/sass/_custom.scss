@@ -1,0 +1,43 @@
+body {
+    height: 100vh;
+    background: url($background-image) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.small-text {
+    font-size: $font-size-sm;
+}
+
+.btn-round {
+    border-radius: 25px;
+    width: 30px;
+    height: 30px;
+}
+
+.btn-pill {
+    width: 138px;
+    font-size: 0.75rem;
+    height: 30px;
+    margin-top: 5px;
+}
+
+.btn-secondary-dim {
+    background: $transparent-grey;
+    color: $white;
+    border: none;
+}
+
+.inactive-btn-warning:hover {
+    background-color: $yellow;
+    border-color: $yellow;
+    cursor: default !important;
+}
+
+.drop-shadow {
+    -webkit-box-shadow: 6px 3px 12px -5px rgba(0,0,0,0.75);
+    -moz-box-shadow: 6px 3px 12px -5px rgba(0,0,0,0.75);
+    box-shadow: 6px 3px 12px -5px rgba(0,0,0,0.75);
+}
