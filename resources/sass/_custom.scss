@@ -41,3 +41,17 @@ body {
     -moz-box-shadow: 6px 3px 12px -5px rgba(0,0,0,0.75);
     box-shadow: 6px 3px 12px -5px rgba(0,0,0,0.75);
 }
+
+.is-active {
+    display: block;
+    opacity: 1;
+}
+
+.blurred {
+    filter: blur(4px);
+    -webkit-filter: blur(4px);
+}
+
+.margin-btm-sm {
+    margin-bottom: 5px;
+}

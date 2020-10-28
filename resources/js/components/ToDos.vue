@@ -22,8 +22,8 @@
                             <div class="btn btn-pill btn-warning inactive-btn-warning drop-shadow">Due: {{ todo.due_date }}</div>
                         </div>
                     </div>
-                    <div class="col-2">
-                        <img class="todo-image" src="images/Matt_Wood.jpeg" alt="">
+                    <div v-if="todo.image" class="col-2">
+                        <img class="todo-image" :src="todo.image" alt="">
                     </div>
                 </div>
                 <div class="toolbar">
@@ -48,6 +48,8 @@
 </template>
 
 <script>
+import { EventBus } from "../eventbus/event-bus";
+
 export default {
     props: {
         todos: {
@@ -55,12 +57,17 @@ export default {
             default: null
         }
     },
+    data() {
+        return {
+
+        }
+    },
     methods: {
         hasReminder(todo) {
             return todo.remind_at;
         },
         openAddToDoModal() {
-            alert('open Modal');
+            EventBus.$emit('modal-open-add-todo');
         }
     }
 }
