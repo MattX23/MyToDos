@@ -11,6 +11,13 @@ class ToDoController extends Controller
      */
     public function get(): JsonResponse
     {
-        return $this->apiResponse($this->user->toDos->toArray());
+        $todos = $this->user->toDos->groupby('complete');
+
+        return $this->apiResponse(
+            [
+                'incomplete' => $todos[0],
+                'complete'   => $todos[1],
+            ]
+        );
     }
 }
