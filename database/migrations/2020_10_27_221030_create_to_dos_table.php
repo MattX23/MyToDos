@@ -17,7 +17,7 @@ class CreateToDosTable extends Migration
             $table->id();
             $table->bigInteger('user_id')->index();
             $table->string('title');
-            $table->string('body');
+            $table->string('body')->nullable();
             $table->date('due_date')->nullable();
             $table->date('remind_at')->nullable();
             $table->boolean('complete')->default(false);
