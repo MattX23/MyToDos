@@ -25,7 +25,15 @@
                                         <label for="title">Title:</label>
                                     </div>
                                     <div class="col-9">
-                                        <input type="text" class="form-control" id="title" placeholder="Give your To Do a name">
+                                        <input
+                                            v-model="title"
+                                            @keydown="clearError('title')"
+                                            type="text"
+                                            class="form-control"
+                                            id="title"
+                                            placeholder="Give your To Do a name"
+                                        >
+                                        <span v-if="errors.title" class="error">{{ errors.title }}</span>
                                     </div>
                                 </div>
                                 <div class="row margin-btm-sm">
@@ -33,7 +41,13 @@
                                         <label for="details">Details:</label>
                                     </div>
                                     <div class="col-9">
-                                        <textarea class="form-control" rows="3" id="details" placeholder="Additional info"></textarea>
+                                        <textarea
+                                            v-model="details"
+                                            class="form-control"
+                                            rows="3"
+                                            id="details"
+                                            placeholder="Additional info"
+                                        ></textarea>
                                     </div>
                                 </div>
                                 <div class="row margin-btm-sm">
@@ -41,19 +55,35 @@
                                         <label for="due_date">Due Date:</label>
                                     </div>
                                     <div class="col-9">
-                                        <input type="date" class="form-control" id="due_date">
+                                        <input
+                                            @focus="clearError('dueDate')  "
+                                            v-model="dueDate"
+                                            type="date"
+                                            class="form-control"
+                                            id="due_date"
+                                        >
+                                        <span v-if="errors.dueDate" class="error">{{ errors.dueDate }}</span>
                                     </div>
                                 </div>
-                                <div class="row margin-btm-sm">
+                                <div v-if="shouldShowReminder" class="row margin-btm-sm">
                                     <div class="col-3 label">
                                         <label for="remind_at">Remind me:</label>
                                     </div>
                                     <div class="col-9">
-                                        <select id="remind_at" class="form-control">
-                                            <option disabled selected>Never</option>
-                                            <option>1 day before due date</option>
-                                            <option>2 days before due date</option>
+                                        <select @change="clearError('remindAt')" v-model="remindAt" id="remind_at" class="form-control">
+                                            <option value="0" disabled selected>Never</option>
+                                            <option value="1">1 day before due date</option>
+                                            <option value="2">2 days before due date</option>
+                                            <option value="3">3 days before due date</option>
+                                            <option value="4">4 days before due date</option>
+                                            <option value="5">5 days before due date</option>
+                                            <option value="6">6 days before due date</option>
+                                            <option value="7">1 week before due date</option>
+                                            <option value="14">2 weeks before due date</option>
+                                            <option value="21">3 weeks before due date</option>
+                                            <option value="28">4 weeks before due date</option>
                                         </select>
+                                        <span v-if="errors.remindAt" class="error">{{ errors.remindAt }}</span>
                                     </div>
                                 </div>
                                 <div class="row margin-btm-sm">
@@ -61,7 +91,7 @@
                                         <label for="image">Image:</label>
                                     </div>
                                     <div class="col-9">
-                                        <input type="file" id="image" accept="image/*">
+                                        <input @change="selectFile('image')" type="file" id="image" accept="image/*">
                                     </div>
                                 </div>
                                 <div class="row margin-btm-sm">
@@ -69,7 +99,7 @@
                                         <label for="file">Attachment:</label>
                                     </div>
                                     <div class="col-9">
-                                        <input type="file" id="file">
+                                        <input @change="selectFile('file')" type="file" id="file">
                                     </div>
                                 </div>
                             </div>
@@ -85,6 +115,7 @@
                         Cancel
                     </button>
                     <button
+                        @click="submitToDo"
                         class="btn btn-success"
                         type="button"
                     >
@@ -98,6 +129,7 @@
 
 <script>
 import { EventBus } from "../../eventbus/event-bus";
+import moment from '../../../../node_modules/moment';
 
 export default {
     props: {
@@ -106,10 +138,74 @@ export default {
             default: false
         },
     },
+    data() {
+        return {
+            title: '',
+            details: '',
+            dueDate: null,
+            remindAt: 0,
+            image: null,
+            attachment: null,
+            errors: {}
+        }
+    },
+    computed: {
+        shouldShowReminder() {
+            const today = moment().format('YYYY-MM-DD');
+            return this.dueDate &&
+                this.dueDate > today;
+        }
+    },
     methods: {
+        clearError(error) {
+            this.errors[error] = '';
+        },
         closeModal() {
             EventBus.$emit('close-modal');
         },
+        reminderIsInTheFuture() {
+            return moment().add(1, 'days').format('YYYY-MM-DD') <=
+                moment(this.dueDate).subtract(this.remindAt, 'days').format('YYYY-MM-DD');
+        },
+        selectFile(type) {
+            if (type === 'image') {
+                this.image = event.target.files[0];
+            }
+
+            if (type === 'file') {
+                this.attachment = event.target.files[0];
+            }
+        },
+        submitToDo() {
+            if (this.validateData()) {
+                // submit data
+            }
+        },
+        validateData() {
+            let isValid = true;
+            this.errors = {};
+
+            if (this.title.length < 1) {
+                this.errors.title = 'The title must be at least two characters';
+                isValid = false;
+            }
+
+            if (this.dueDate) {
+                if (this.dueDate < this.today) {
+                    this.errors.dueDate = 'The due date cannot be in the past';
+                    isValid = false;
+                }
+            }
+
+            if (this.remindAt) {
+                  if (! this.reminderIsInTheFuture()) {
+                    this.errors.remindAt = 'Reminders cannot be set in the past';
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
     }
 }
 </script>
