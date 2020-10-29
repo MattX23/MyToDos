@@ -16,7 +16,7 @@ $factory->define(ToDo::class, function (Faker $faker) {
 
     return [
         'title'     => $faker->sentence(rand(2, 6)),
-        'body'      => $faker->sentence(rand(5, 15)),
+        'body'      => rand(0, 10) <= 5 ? null : $faker->sentence(rand(5, 15)),
         'due_date'  => $dueDate,
         'remind_at' => rand(0, 10) <= 5 && $dueDate ? $remindAt : null,
         'complete'  => rand(0, 10) <= 5 ? true : false,
