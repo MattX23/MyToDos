@@ -47,6 +47,9 @@ class User extends Authenticatable
      */
     public function toDos(): HasMany
     {
-        return $this->hasMany(ToDo::class);
+        return $this
+            ->hasMany(ToDo::class)
+            ->orderByRaw('ISNULL (due_date), due_date ASC');
     }
+
 }

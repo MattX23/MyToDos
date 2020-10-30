@@ -5,16 +5,17 @@ namespace App;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * @property $user_id
- * @property $title
- * @property $body
- * @property $due_date
- * @property $remind_at
- * @property $complete
- * @property $image
- * @property $attachment
+ * @property int $user_id
+ * @property string $title
+ * @property string $body
+ * @property string $due_date
+ * @property string $remind_at
+ * @property bool $complete
+ * @property string $image
+ * @property Attachment $attachment
  */
 class ToDo extends Model implements Arrayable
 {
@@ -34,7 +35,13 @@ class ToDo extends Model implements Arrayable
         'remind_at',
         'complete',
         'image',
-        'attachment',
+    ];
+
+    /**
+     * @var array
+     */
+    protected $with = [
+        'attachment'
     ];
 
     /**
@@ -45,6 +52,9 @@ class ToDo extends Model implements Arrayable
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         return [
@@ -57,5 +67,13 @@ class ToDo extends Model implements Arrayable
             'image'      => $this->image,
             'attachment' => $this->attachment,
         ];
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function attachment(): HasOne
+    {
+        return $this->hasOne(Attachment::class);
     }
 }

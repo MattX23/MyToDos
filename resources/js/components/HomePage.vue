@@ -26,6 +26,10 @@ export default {
             this.isAddTodoModalActive = false;
             this.isBlurred = false;
         });
+        EventBus.$on('update-todos', (todos) => {
+            this.complete = todos.complete;
+            this.incomplete = todos.incomplete;
+        });
     },
     mounted() {
         this.getToDos();

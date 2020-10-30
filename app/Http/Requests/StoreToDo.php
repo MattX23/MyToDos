@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreToDo extends FormRequest
@@ -27,9 +28,20 @@ class StoreToDo extends FormRequest
             'title'      => 'required|string|min:2',
             'body'       => 'nullable|string',
             'dueDate'    => 'nullable|date|required_with:remindAt',
-            'remindAt'   => 'nullable|integer',
+            'remindAt'   => 'nullable|exclude_if:dueDate,null|date|after:tomorrow',
             'image'      => 'nullable|image|max:4096',
             'attachment' => 'nullable|file|max:4096',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        if ($this->dueDate && $this->remindAt) {
+            $this->merge([
+                'remindAt' => Carbon::parse($this->dueDate)
+                    ->subDays($this->remindAt)
+                    ->format('Y-m-d'),
+            ]);
+        }
     }
 }

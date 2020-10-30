@@ -73,17 +73,8 @@
                                     </div>
                                     <div class="col-9">
                                         <select @change="clearError('remindAt')" v-model="todo.remindAt" id="remind_at" class="form-control">
-                                            <option value="0" disabled selected>Never</option>
-                                            <option value="1">1 day before due date</option>
-                                            <option value="2">2 days before due date</option>
-                                            <option value="3">3 days before due date</option>
-                                            <option value="4">4 days before due date</option>
-                                            <option value="5">5 days before due date</option>
-                                            <option value="6">6 days before due date</option>
-                                            <option value="7">1 week before due date</option>
-                                            <option value="14">2 weeks before due date</option>
-                                            <option value="21">3 weeks before due date</option>
-                                            <option value="28">4 weeks before due date</option>
+                                            <option value="" disabled selected>Never</option>
+                                            <option v-for="(reminderDay, value) in reminderDays" :value="value">{{ reminderDay }}</option>
                                         </select>
                                         <span v-if="errors.remindAt" class="error">{{ errors.remindAt }}</span>
                                     </div>
@@ -136,6 +127,7 @@ import { EventBus } from "../../eventbus/event-bus";
 import moment from '../../../../node_modules/moment';
 
 const STORE_TO_DO_ROUTE = '/api/store-to-do';
+const GET_REMINDER_DAYS_ROUTE = '/api/get-reminder-days';
 
 export default {
     props: {
@@ -144,13 +136,18 @@ export default {
             default: false
         },
     },
+    mounted() {
+        this.$nextTick(function () {
+            this.getReminderDaysOptions();
+        });
+    },
     data() {
         return {
             todo: {
                 title: '',
                 body: '',
                 dueDate: null,
-                remindAt: 0,
+                remindAt: "",
                 image: null,
                 attachment: null,
             },
@@ -161,7 +158,8 @@ export default {
                 remindAt: '',
                 image: '',
                 attachment: '',
-            }
+            },
+            reminderDays: {},
         }
     },
     computed: {
@@ -169,7 +167,15 @@ export default {
             const today = moment().format('YYYY-MM-DD');
             return this.todo.dueDate &&
                 this.todo.dueDate > today;
+        },
+        dueDate() {
+            return this.todo.dueDate;
         }
+    },
+    watch: {
+        dueDate: function (val) {
+            if (val === null || val === "") this.todo.remindAt = "";
+        },
     },
     methods: {
         clearError(error) {
@@ -181,8 +187,25 @@ export default {
                 this.errors[key] = '';
             }
         },
+        clearFields() {
+            const fieldObj = this.todo;
+            for (const key of Object.keys(fieldObj)) {
+                this.todo[key] = '';
+            }
+        },
         closeModal() {
+            this.clearFields();
+            this.clearAllErrors();
             EventBus.$emit('close-modal');
+        },
+        getReminderDaysOptions() {
+            axios.get(GET_REMINDER_DAYS_ROUTE)
+                .then(response => {
+                    this.reminderDays = response.data;
+                })
+                .catch(errors => {
+
+                })
         },
         reminderIsInTheFuture() {
             return moment().add(1, 'days').format('YYYY-MM-DD') <=
@@ -209,7 +232,8 @@ export default {
 
                 axios.post(STORE_TO_DO_ROUTE, formData)
                     .then(response => {
-
+                        this.closeModal();
+                        EventBus.$emit('update-todos', response.data);
                     })
                     .catch(errors => {
                         const errorObj = errors.response.data.errors;

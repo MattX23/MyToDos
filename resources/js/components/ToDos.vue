@@ -1,48 +1,57 @@
 <template>
-    <div class="col-sm-6 todo-container">
+    <div class="col-sm-6">
         <header>In Progress
             <span
-                @click="openAddToDoModal"
-                id="addToDo"
-                class="drop-shadow"
+                    @click="openAddToDoModal"
+                    id="addToDo"
+                    class="drop-shadow"
             >+</span>
         </header>
-        <div v-for="todo in todos">
-            <article
-                :key="todo.id"
-                class="todo-item"
-            >
-                <div class="row">
-                    <div class="col-10">
+        <div class="row">
+            <div class="col-12 todo-container">
+                <div v-for="todo in todos">
+                    <article
+                            :key="todo.id"
+                            class="todo-item"
+                    >
+                        <div class="row">
+                            <div class="col-10">
                         <span id="todo-header">
                             <input type="checkbox">
                             <span id="todo-header-text">{{ todo.title }}</span>
                         </span>
-                        <div v-if="todo.due_date">
-                            <div class="btn btn-pill btn-warning inactive-btn-warning drop-shadow">Due: {{ todo.due_date }}</div>
+                                <div class="row">
+                                    <div class="col-6" v-if="todo.due_date">
+                                        <div class="btn btn-pill btn-warning inactive-btn-warning drop-shadow float-right" title="Due date"><i class="zmdi zmdi-calendar"></i> {{ todo.due_date }}</div>
+                                    </div>
+                                    <div class="col-6" v-if="todo.remind_at">
+                                        <div class="btn btn-pill btn-info inactive-btn-info drop-shadow float-left" title="Reminder set"><i class="zmdi zmdi-time"></i> {{ todo.remind_at }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="todo.image" class="col-2">
+                                <img class="todo-image" :src="todo.image" alt="">
+                            </div>
                         </div>
-                    </div>
-                    <div v-if="todo.image" class="col-2">
-                        <img class="todo-image" :src="todo.image" alt="">
-                    </div>
+                        <div class="toolbar">
+                            <div class="toolbar-row">
+                                <button class="btn btn-sm btn-round btn-secondary">
+                                    <i class="zmdi zmdi-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-secondary btn-round">
+                                    <i class="zmdi zmdi-attachment-alt"></i>
+                                </button>
+                                <button :class="[ hasReminder(todo) ? 'btn-secondary' : 'btn-secondary-dim' ]" class="btn btn-sm btn-secondary btn-round">
+                                    <i class="zmdi zmdi-time"></i>
+                                </button>
+                                <button class="btn btn-sm btn-round btn-secondary">
+                                    <i class="zmdi zmdi-delete"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
                 </div>
-                <div class="toolbar">
-                    <div class="toolbar-row">
-                        <button class="btn btn-sm btn-round btn-secondary">
-                            <i class="zmdi zmdi-eye"></i>
-                        </button>
-                        <button class="btn btn-sm btn-secondary btn-round">
-                            <i class="zmdi zmdi-attachment-alt"></i>
-                        </button>
-                        <button :class="[ hasReminder(todo) ? 'btn-secondary' : 'btn-secondary-dim' ]" class="btn btn-sm btn-secondary btn-round">
-                            <i class="zmdi zmdi-time"></i>
-                        </button>
-                        <button class="btn btn-sm btn-round btn-secondary">
-                            <i class="zmdi zmdi-delete"></i>
-                        </button>
-                    </div>
-                </div>
-            </article>
+            </div>
         </div>
     </div>
 </template>
@@ -77,8 +86,11 @@ export default {
 @import '../../sass/variables';
 
 .todo-container {
-    background: rgba(255,255,255,0.5);
+    background: $white-semi-transparent;
     padding-bottom: 30px;
+    max-height: 80vh;
+    overflow: scroll;
+    padding-top: 10px;
 }
 .todo-item {
     position: relative;
@@ -93,7 +105,7 @@ export default {
 }
 header {
     font-size: 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 .toolbar {
     position: absolute;
@@ -135,7 +147,7 @@ header {
     width: 40px;
     text-align: center;
     height: 40px;
-    margin-top: 10px;
+    margin-top: 7px;
     cursor: pointer;
     border-radius: 10px;
     font-size: 1.5rem;

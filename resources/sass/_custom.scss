@@ -36,6 +36,12 @@ body {
     cursor: default !important;
 }
 
+.inactive-btn-info:hover {
+    background-color: $blue;
+    border-color: $blue;
+    cursor: default !important;
+}
+
 .drop-shadow {
     -webkit-box-shadow: 6px 3px 12px -5px rgba(0,0,0,0.75);
     -moz-box-shadow: 6px 3px 12px -5px rgba(0,0,0,0.75);
