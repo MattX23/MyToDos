@@ -22,6 +22,7 @@ class CreateToDosTable extends Migration
             $table->date('remind_at')->nullable();
             $table->boolean('complete')->default(false);
             $table->string('image')->nullable();
+            $table->string('attachment')->nullable();
             $table->timestamps();
         });
     }

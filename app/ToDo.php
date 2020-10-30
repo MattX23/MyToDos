@@ -14,9 +14,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property $remind_at
  * @property $complete
  * @property $image
+ * @property $attachment
  */
 class ToDo extends Model implements Arrayable
 {
+    const IMAGE_FILE_PATH = '/public/images/';
+    const IMAGE_DISPLAY_PATH = '/images/';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -30,6 +34,7 @@ class ToDo extends Model implements Arrayable
         'remind_at',
         'complete',
         'image',
+        'attachment',
     ];
 
     /**
@@ -43,13 +48,14 @@ class ToDo extends Model implements Arrayable
     public function toArray(): array
     {
         return [
-            'user_id'   => $this->user_id,
-            'title'     => $this->title,
-            'body'      => $this->body,
-            'due_date'  => $this->due_date,
-            'remind_at' => $this->remind_at,
-            'complete'  => $this->complete,
-            'image'     => $this->image,
+            'user_id'    => $this->user_id,
+            'title'      => $this->title,
+            'body'       => $this->body,
+            'due_date'   => $this->due_date,
+            'remind_at'  => $this->remind_at,
+            'complete'   => $this->complete,
+            'image'      => $this->image,
+            'attachment' => $this->attachment,
         ];
     }
 }
