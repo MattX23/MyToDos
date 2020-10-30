@@ -35,16 +35,30 @@
                         </div>
                         <div class="toolbar">
                             <div class="toolbar-row">
-                                <button class="btn btn-sm btn-round btn-secondary">
+                                <button
+                                    class="btn btn-sm btn-round btn-secondary"
+                                    title="View To Do"
+                                >
                                     <i class="zmdi zmdi-eye"></i>
                                 </button>
-                                <button class="btn btn-sm btn-secondary btn-round">
+                                <button
+                                    :class="[ hasAttachment(todo) ? 'btn-secondary' : 'btn-secondary-dim' ]"
+                                    class="btn btn-sm btn-round"
+                                    title="Attachments"
+                                >
                                     <i class="zmdi zmdi-attachment-alt"></i>
                                 </button>
-                                <button :class="[ hasReminder(todo) ? 'btn-secondary' : 'btn-secondary-dim' ]" class="btn btn-sm btn-secondary btn-round">
+                                <button
+                                    :class="[ hasReminder(todo) ? 'btn-secondary' : 'btn-secondary-dim' ]"
+                                    class="btn btn-sm btn-secondary btn-round"
+                                    title="Reminder"
+                                >
                                     <i class="zmdi zmdi-time"></i>
                                 </button>
-                                <button class="btn btn-sm btn-round btn-secondary">
+                                <button
+                                    class="btn btn-sm btn-round btn-secondary"
+                                    title="Delete To Do"
+                                >
                                     <i class="zmdi zmdi-delete"></i>
                                 </button>
                             </div>
@@ -74,6 +88,9 @@ export default {
     methods: {
         hasReminder(todo) {
             return todo.remind_at;
+        },
+        hasAttachment(todo) {
+            return todo.attachment;
         },
         openAddToDoModal() {
             EventBus.$emit('modal-open-add-todo');
