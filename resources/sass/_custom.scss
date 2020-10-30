@@ -57,7 +57,12 @@ body {
 }
 
 .error {
+    display: inline-block;
     font-size: 0.75rem;
     color: red;
     margin-left: 3px;
+}
+
+button, input {
+    overflow: auto;
 }
