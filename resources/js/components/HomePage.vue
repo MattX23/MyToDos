@@ -45,7 +45,6 @@ export default {
                     this.complete = response.data.complete;
                     this.incomplete = response.data.incomplete;
                 })
-                .catch(error => console.log(error))
         }
     }
 }
