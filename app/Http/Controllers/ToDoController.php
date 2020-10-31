@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Attachment;
 use App\Http\Requests\StoreToDo;
 use App\ToDo;
+use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
@@ -13,19 +14,22 @@ use Illuminate\Support\Facades\Storage;
 class ToDoController extends Controller
 {
     /**
+     * @param \App\User $user
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function get(): JsonResponse
+    public function get(User $user): JsonResponse
     {
-        return $this->apiResponse($this->getTodos());
+        return $this->apiResponse($this->getTodos($user));
     }
 
     /**
+     * @param \App\User                    $user
      * @param \App\Http\Requests\StoreToDo $request
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(StoreToDo $request): JsonResponse
+    public function store(User $user, StoreToDo $request): JsonResponse
     {
         $image = $request->file('image');
         $attachment = $request->file('attachment');
@@ -33,7 +37,7 @@ class ToDoController extends Controller
         $imageName = $image ? $this->storeImage($image) : null;
 
         $toDo = ToDo::create([
-            'user_id'   => $this->user->id,
+            'user_id'   => $user->id,
             'title'     => $request->get('title'),
             'body'      => $request->get('body'),
             'due_date'  => $request->get('dueDate'),
@@ -43,15 +47,17 @@ class ToDoController extends Controller
 
         if ($attachment) $this->storeAttachment($attachment, $toDo);
 
-        return $this->apiResponse($this->getTodos());
+        return $this->apiResponse($this->getTodos($user));
     }
 
     /**
+     * @param \App\User $user
+     *
      * @return array
      */
-    public function getTodos(): array
+    public function getTodos(User $user): array
     {
-        $toDos = $this->user->toDos->groupby('complete');
+        $toDos = $user->toDos->groupby('complete');
 
         return [
             'incomplete' => isset($toDos[0]) ? $toDos[0] : [],
