@@ -34,7 +34,7 @@ class ToDoController extends Controller
         $image = $request->file('image');
         $attachment = $request->file('attachment');
 
-        $imageName = $image ? $this->storeImage($image) : null;
+        $imageName = $image ? $this->storeImage($image, $user) : null;
 
         $toDo = ToDo::create([
             'user_id'   => $user->id,
@@ -75,12 +75,14 @@ class ToDoController extends Controller
 
     /**
      * @param \Illuminate\Http\UploadedFile $image
+     * @param \App\User                     $user
      *
      * @return string
      */
-    protected function storeImage(UploadedFile $image): string
+    protected function storeImage(UploadedFile $image, User $user): string
     {
-        $storagePath = Storage::put(ToDo::IMAGE_FILE_PATH, $image);
+        $storageName = md5($image->getClientOriginalName().$user->id);
+        $storagePath = Storage::putFileAs(ToDo::IMAGE_FILE_PATH, $image, $storageName);
 
         return ToDo::IMAGE_DISPLAY_PATH.basename($storagePath);
     }
@@ -91,12 +93,14 @@ class ToDoController extends Controller
      */
     protected function storeAttachment(UploadedFile $attachment, ToDo $toDo): void
     {
-        $storagePath = Storage::put(Attachment::ATTACHMENT_FILE_PATH, $attachment);
+        $storageName = md5($attachment->getClientOriginalName().$toDo->user->id);
+        $storagePath = Storage::putFileAs(Attachment::ATTACHMENT_FILE_PATH, $attachment, $storageName);
+        $attachmentDisplayPath = str_replace('public', '', $storagePath);
 
         Attachment::create([
             'to_do_id'     => $toDo->id,
             'display_name' => $attachment->getClientOriginalName(),
-            'file_path'    => $storagePath,
+            'file_path'    => $attachmentDisplayPath,
         ]);
     }
 }

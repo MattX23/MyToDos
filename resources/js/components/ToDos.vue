@@ -1,6 +1,6 @@
 <template>
     <div class="col-sm-6">
-        <header>In Progress
+        <header>In Progress ({{ todos.length }})
             <span
                     @click="openAddToDoModal"
                     id="addToDo"
@@ -21,21 +21,32 @@
                             <span id="todo-header-text">{{ todo.title }}</span>
                         </span>
                                 <div class="row">
-                                    <div class="col-6" v-if="todo.due_date">
-                                        <div class="btn btn-pill btn-warning inactive-btn-warning drop-shadow float-right" title="Due date"><i class="zmdi zmdi-calendar"></i> {{ todo.due_date }}</div>
+                                    <div class="d-none d-lg-block col-6" v-if="todo.due_date">
+                                        <div
+                                            :class="[ isOverDue(todo.due_date) ? 'btn-danger inactive-btn-danger ' : 'btn-warning inactive-btn-warning' ]"
+                                            class="btn btn-pill drop-shadow margin-left"
+                                            title="Due date"
+                                        ><i class="zmdi zmdi-calendar"></i> {{ todo.due_date }}</div>
                                     </div>
-                                    <div class="col-6" v-if="todo.remind_at">
-                                        <div class="btn btn-pill btn-info inactive-btn-info drop-shadow float-left" title="Reminder set"><i class="zmdi zmdi-time"></i> {{ todo.remind_at }}</div>
+                                    <div class="d-none d-lg-block col-6" v-if="todo.remind_at">
+                                        <div
+                                            class="btn btn-pill btn-info inactive-btn-info drop-shadow float-left"
+                                            title="Reminder set"
+                                        ><i class="zmdi zmdi-time"></i> {{ todo.remind_at }}</div>
                                     </div>
                                 </div>
                             </div>
                             <div v-if="todo.image" class="col-2">
-                                <img class="todo-image" :src="todo.image" alt="">
+                                <img class="todo-image round-image" :src="todo.image" alt="">
+                            </div>
+                            <div v-else class="col-2">
+                                <div class="image-placeholder round-image">{{ todo.title.substring(0, 1) }}</div>
                             </div>
                         </div>
                         <div class="toolbar">
                             <div class="toolbar-row">
                                 <button
+                                    @click="openViewToDoModal(todo)"
                                     class="btn btn-sm btn-round btn-secondary"
                                     title="View To Do"
                                 >
@@ -72,6 +83,7 @@
 
 <script>
 import { EventBus } from "../eventbus/event-bus";
+import moment from '../../../node_modules/moment';
 
 export default {
     props: {
@@ -86,14 +98,20 @@ export default {
         }
     },
     methods: {
-        hasReminder(todo) {
-            return todo.remind_at;
-        },
         hasAttachment(todo) {
             return todo.attachment;
         },
+        hasReminder(todo) {
+            return todo.remind_at;
+        },
+        isOverDue(dueDate) {
+            return moment(dueDate).isBefore();
+        },
         openAddToDoModal() {
             EventBus.$emit('modal-open-add-todo');
+        },
+        openViewToDoModal(todo) {
+            EventBus.$emit('modal-open-view-todo', todo);
         }
     }
 }
@@ -144,10 +162,7 @@ header {
     padding-bottom: 5px;
 }
 .todo-image{
-    width: 65px;
-    border-radius: 100px;
     float: right;
-    height: 65px;
 }
 .due-date {
     font-size: 1.5rem;

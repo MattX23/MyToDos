@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Attachment extends Model implements Arrayable
 {
-    const ATTACHMENT_FILE_PATH = '/public/attachments/';
+    const ATTACHMENT_FILE_PATH = '/public/attachments';
 
     /**
      * The attributes that are mass assignable.

@@ -16,10 +16,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property bool $complete
  * @property string $image
  * @property Attachment $attachment
+ * @property User $user
  */
 class ToDo extends Model implements Arrayable
 {
-    const IMAGE_FILE_PATH = '/public/images/';
+    const IMAGE_FILE_PATH = '/public/images';
     const IMAGE_DISPLAY_PATH = '/images/';
 
     /**
@@ -53,6 +54,14 @@ class ToDo extends Model implements Arrayable
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function attachment(): HasOne
+    {
+        return $this->hasOne(Attachment::class);
+    }
+
+    /**
      * @return array
      */
     public function toArray(): array
@@ -67,13 +76,5 @@ class ToDo extends Model implements Arrayable
             'image'      => $this->image,
             'attachment' => $this->attachment,
         ];
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function attachment(): HasOne
-    {
-        return $this->hasOne(Attachment::class);
     }
 }

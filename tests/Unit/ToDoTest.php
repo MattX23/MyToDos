@@ -77,7 +77,7 @@ class ToDoTest extends TestCase
             'attachment' => $file
         ]);
 
-        $response->assertOk();
+        $this->assertMatchesJsonSnapshot($response->getContent());
     }
 
     public function testStoreToDoWithOversizedAttachment()
@@ -105,7 +105,7 @@ class ToDoTest extends TestCase
             'image' => $image
         ]);
 
-        $response->assertOk();
+        $this->assertMatchesJsonSnapshot($response->getContent());
     }
 
     public function testStoreToDoWithOversizedImage()
