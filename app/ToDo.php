@@ -16,10 +16,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property bool $complete
  * @property string $image
  * @property Attachment $attachment
+ * @property User $user
  */
 class ToDo extends Model implements Arrayable
 {
-    const IMAGE_FILE_PATH = '/public/images/';
+    const IMAGE_FILE_PATH = '/public/images';
     const IMAGE_DISPLAY_PATH = '/images/';
 
     /**

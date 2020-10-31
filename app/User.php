@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 
 /**
+ * @property int $id
  * @property string $name
  * @property string $email
  * @property Collection $toDos
