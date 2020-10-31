@@ -14,7 +14,9 @@ class UserSeeder extends Seeder
     public function run()
     {
         factory(User::class, 5)->create()->each(function(User $user) {
-            $user->toDos()->save(factory(ToDo::class)->make());
+            for ($i = 0; $i <= 5; $i++) {
+                $user->toDos()->save(factory(ToDo::class)->make());
+            }
         });
     }
 }

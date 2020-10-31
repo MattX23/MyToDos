@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<home-page></home-page>
+<home-page
+    :user-id="{{ Auth::user()->id }}"
+></home-page>
 @endsection
