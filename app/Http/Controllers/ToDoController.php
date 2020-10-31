@@ -92,11 +92,12 @@ class ToDoController extends Controller
     protected function storeAttachment(UploadedFile $attachment, ToDo $toDo): void
     {
         $storagePath = Storage::put(Attachment::ATTACHMENT_FILE_PATH, $attachment);
+        $attachmentDisplayPath = str_replace('public', '', $storagePath);
 
         Attachment::create([
             'to_do_id'     => $toDo->id,
             'display_name' => $attachment->getClientOriginalName(),
-            'file_path'    => $storagePath,
+            'file_path'    => $attachmentDisplayPath,
         ]);
     }
 }
