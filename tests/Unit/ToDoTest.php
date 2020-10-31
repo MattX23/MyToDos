@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
@@ -127,5 +128,30 @@ class ToDoTest extends TestCase
         $response = $this->get( '/api/get-reminder-days');
 
         $this->assertMatchesJsonSnapshot($response->getContent());
+    }
+
+    public function testStoreWithDueDateInPast()
+    {
+        $response = $this->post( '/api/store-to-do/'.$this->user->id, [
+            'title'   => 'To Do with Due Date',
+            'dueDate' => Carbon::now()->subDays(1)->format('Y-m-d'),
+        ]);
+
+        $response
+            ->assertSessionHasErrors('dueDate')
+            ->assertStatus(302);
+    }
+
+    public function testStoreWithReminderBeforeDueDate()
+    {
+        $response = $this->post( '/api/store-to-do/'.$this->user->id, [
+            'title'    => 'To Do with Reminder',
+            'dueDate'  => Carbon::now()->addDays(2)->format('Y-m-d'),
+            'remindAt' => 1,
+        ]);
+
+        $response
+            ->assertSessionHasErrors( 'remindAt')
+            ->assertStatus(302);
     }
 }

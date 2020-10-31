@@ -27,7 +27,7 @@ class StoreToDo extends FormRequest
         return [
             'title'      => 'required|string|min:2',
             'body'       => 'nullable|string',
-            'dueDate'    => 'nullable|date|required_with:remindAt',
+            'dueDate'    => 'nullable|date|required_with:remindAt|after:today',
             'remindAt'   => 'nullable|exclude_if:dueDate,null|date|after:tomorrow',
             'image'      => 'nullable|image|max:4096',
             'attachment' => 'nullable|file|max:4096',
