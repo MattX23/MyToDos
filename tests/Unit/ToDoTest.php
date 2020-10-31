@@ -10,7 +10,7 @@ use Spatie\Snapshots\MatchesSnapshots;
 use Tests\TestCase;
 use Tests\Traits\TestSetupTrait;
 
-class UserTest extends TestCase
+class ToDoTest extends TestCase
 {
     use RefreshDatabase;
     use TestSetupTrait;
