@@ -88,3 +88,22 @@ button, input {
 .margin-left {
     margin-left: 20px;
 }
+
+.modal-body p {
+    margin-top: 7px;
+    margin-bottom: 0;
+}
+
+.image-placeholder {
+    background: $seagreen;
+    text-align: center;
+    padding-top: 13px;
+    font-size: 1.5rem;
+    color: $white;
+    border: 1px solid $lightgreen;
+    float: right;
+}
+
+.close {
+    cursor: pointer;
+}

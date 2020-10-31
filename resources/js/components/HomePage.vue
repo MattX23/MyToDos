@@ -2,7 +2,6 @@
     <div>
         <div :class="{'blurred' : isBlurred}" class="container">
             <to-dos
-                :user-id="userId"
                 :todos="incomplete"
             ></to-dos>
         </div>
@@ -10,6 +9,11 @@
             :user-id="userId"
             :is-active="isAddTodoModalActive"
         ></modal-add-todo>
+        <modal-view-todo
+            :user-id="userId"
+            :is-active="isViewTodoModalActive"
+            :todo="activeTodo"
+        ></modal-view-todo>
     </div>
 </template>
 
@@ -25,8 +29,14 @@ export default {
             this.isAddTodoModalActive = true;
             this.isBlurred = true;
        });
+        EventBus.$on('modal-open-view-todo', (todo) => {
+            this.isViewTodoModalActive = true;
+            this.activeTodo = todo;
+            this.isBlurred = true;
+        });
         EventBus.$on('close-modal', () => {
             this.isAddTodoModalActive = false;
+            this.isViewTodoModalActive = false;
             this.isBlurred = false;
         });
         EventBus.$on('update-todos', (todos) => {
@@ -43,6 +53,8 @@ export default {
             incomplete: [],
             isBlurred: false,
             isAddTodoModalActive: false,
+            isViewTodoModalActive: false,
+            activeTodo: null,
         }
     },
     methods: {

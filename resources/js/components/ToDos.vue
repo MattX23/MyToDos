@@ -46,6 +46,7 @@
                         <div class="toolbar">
                             <div class="toolbar-row">
                                 <button
+                                    @click="openViewToDoModal(todo)"
                                     class="btn btn-sm btn-round btn-secondary"
                                     title="View To Do"
                                 >
@@ -108,6 +109,9 @@ export default {
         },
         openAddToDoModal() {
             EventBus.$emit('modal-open-add-todo');
+        },
+        openViewToDoModal(todo) {
+            EventBus.$emit('modal-open-view-todo', todo);
         }
     }
 }
@@ -179,14 +183,5 @@ header {
     cursor: pointer;
     border-radius: 10px;
     font-size: 1.5rem;
-}
-.image-placeholder {
-    background: $seagreen;
-    text-align: center;
-    padding-top: 13px;
-    font-size: 1.5rem;
-    color: $white;
-    border: 1px solid $lightgreen;
-    float: right;
 }
 </style>
