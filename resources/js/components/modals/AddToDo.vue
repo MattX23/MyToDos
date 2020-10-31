@@ -126,7 +126,7 @@
 import { EventBus } from "../../eventbus/event-bus";
 import moment from '../../../../node_modules/moment';
 
-const STORE_TO_DO_ROUTE = '/api/store-to-do';
+const STORE_TO_DO_ROUTE = '/api/store-to-do/';
 const GET_REMINDER_DAYS_ROUTE = '/api/get-reminder-days';
 
 export default {
@@ -134,6 +134,9 @@ export default {
         isActive: {
             type: Boolean,
             default: false
+        },
+        userId: {
+            type: Number,
         },
     },
     mounted() {
@@ -230,7 +233,7 @@ export default {
                     }
                 );
 
-                axios.post(STORE_TO_DO_ROUTE, formData)
+                axios.post(STORE_TO_DO_ROUTE+this.$props.userId, formData)
                     .then(response => {
                         this.closeModal();
                         EventBus.$emit('update-todos', response.data);

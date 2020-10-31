@@ -2,10 +2,12 @@
     <div>
         <div :class="{'blurred' : isBlurred}" class="container">
             <to-dos
+                :user-id="userId"
                 :todos="incomplete"
             ></to-dos>
         </div>
         <modal-add-todo
+            :user-id="userId"
             :is-active="isAddTodoModalActive"
         ></modal-add-todo>
     </div>
@@ -14,9 +16,10 @@
 <script>
 import { EventBus } from "../eventbus/event-bus";
 
-const GET_TO_DOS_ROUTE = '/api/get-to-dos';
+const GET_TO_DOS_ROUTE = '/api/get-to-dos/';
 
 export default {
+    props: ['userId'],
     created() {
        EventBus.$on('modal-open-add-todo', () => {
             this.isAddTodoModalActive = true;
@@ -44,7 +47,7 @@ export default {
     },
     methods: {
         getToDos() {
-            axios.get(GET_TO_DOS_ROUTE)
+            axios.get(GET_TO_DOS_ROUTE+this.$props.userId)
                 .then(response => {
                     this.complete = response.data.complete;
                     this.incomplete = response.data.incomplete;
