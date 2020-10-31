@@ -18,8 +18,8 @@ body {
 }
 
 .btn-pill {
-    width: 138px;
-    font-size: 0.75rem;
+    width: 90px;
+    font-size: 0.55rem;
     height: 30px;
     margin-top: 5px;
 }
@@ -39,6 +39,12 @@ body {
 .inactive-btn-info:hover {
     background-color: $blue;
     border-color: $blue;
+    cursor: default !important;
+}
+
+.inactive-btn-danger:hover {
+    background-color: $red;
+    border-color: $red;
     cursor: default !important;
 }
 
@@ -71,4 +77,14 @@ body {
 
 button, input {
     overflow: auto;
+}
+
+.round-image {
+    width: 65px;
+    height: 65px;
+    border-radius: 100px;
+}
+
+.margin-left {
+    margin-left: 20px;
 }
