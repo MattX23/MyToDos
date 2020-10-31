@@ -5,7 +5,13 @@ namespace App;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
+/**
+ * @property string $name
+ * @property string $email
+ * @property Collection $toDos
+ */
 class User extends Authenticatable
 {
     use Notifiable;
@@ -49,7 +55,7 @@ class User extends Authenticatable
     {
         return $this
             ->hasMany(ToDo::class)
-            ->orderByRaw('ISNULL (due_date), due_date ASC');
+            ->orderByRaw('-due_date DESC');
     }
 
 }
