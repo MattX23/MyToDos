@@ -6,7 +6,7 @@ use App\ToDo;
 use App\Traits\ToDoRequestTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreToDo extends FormRequest
+class UpdateToDo extends FormRequest
 {
     use ToDoRequestTrait;
 
@@ -17,7 +17,13 @@ class StoreToDo extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        $toDoId = $this->route('toDo')->id;
+        $userId = $this->route('user')->id;
+
+        return ToDo
+            ::where('id', '=', $toDoId)
+            ->where('user_id', '=', $userId)
+            ->exists();
     }
 
     /**

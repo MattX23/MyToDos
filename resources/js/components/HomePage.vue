@@ -6,8 +6,9 @@
             ></to-dos>
         </div>
         <modal-add-todo
-            :user-id="userId"
+            :active-to-do="activeTodo"
             :is-active="isAddTodoModalActive"
+            :user-id="userId"
         ></modal-add-todo>
         <modal-view-todo
             :user-id="userId"
@@ -25,19 +26,20 @@ const GET_TO_DOS_ROUTE = '/api/get-to-dos/';
 export default {
     props: ['userId'],
     created() {
-       EventBus.$on('modal-open-add-todo', () => {
+        EventBus.$on('close-modal', () => {
+            this.isAddTodoModalActive = false;
+            this.isViewTodoModalActive = false;
+            this.isBlurred = false;
+        });
+        EventBus.$on('modal-open-add-todo', (todo) => {
             this.isAddTodoModalActive = true;
+            this.activeTodo = todo;
             this.isBlurred = true;
        });
         EventBus.$on('modal-open-view-todo', (todo) => {
             this.isViewTodoModalActive = true;
             this.activeTodo = todo;
             this.isBlurred = true;
-        });
-        EventBus.$on('close-modal', () => {
-            this.isAddTodoModalActive = false;
-            this.isViewTodoModalActive = false;
-            this.isBlurred = false;
         });
         EventBus.$on('update-todos', (todos) => {
             this.complete = todos.complete;
@@ -49,12 +51,12 @@ export default {
     },
     data() {
         return {
+            activeTodo: null,
             complete: [],
             incomplete: [],
-            isBlurred: false,
             isAddTodoModalActive: false,
+            isBlurred: false,
             isViewTodoModalActive: false,
-            activeTodo: null,
         }
     },
     methods: {

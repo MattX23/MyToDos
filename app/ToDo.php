@@ -8,20 +8,31 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * @property int $user_id
- * @property string $title
- * @property string $body
- * @property string $due_date
- * @property string $remind_at
- * @property bool $complete
- * @property string $image
+ * @property int        $user_id
+ * @property int        $id
+ * @property string     $title
+ * @property string     $body
+ * @property string     $due_date
+ * @property string     $remind_at
+ * @property bool       $complete
+ * @property string     $image
  * @property Attachment $attachment
- * @property User $user
+ * @property User       $user
  */
 class ToDo extends Model implements Arrayable
 {
+    const ATTACHMENT_DISPLAY_PATH = '/attachments/';
+    const ATTACHMENT_FILE_PATH = 'public/attachments';
     const IMAGE_FILE_PATH = '/public/images';
     const IMAGE_DISPLAY_PATH = '/images/';
+    const RULES = [
+        'attachment' => 'nullable|file|max:4096',
+        'body'       => 'nullable|string',
+        'dueDate'    => 'nullable|date|required_with:remindAt|after:today',
+        'image'      => 'nullable|image|max:4096',
+        'remindAt'   => 'nullable|exclude_if:dueDate,null|date|after:tomorrow',
+        'title'      => 'required|string|min:2',
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -29,13 +40,13 @@ class ToDo extends Model implements Arrayable
      * @var array
      */
     protected $fillable = [
-        'user_id',
-        'title',
         'body',
-        'due_date',
-        'remind_at',
         'complete',
+        'due_date',
         'image',
+        'remind_at',
+        'title',
+        'user_id',
     ];
 
     /**
@@ -67,14 +78,15 @@ class ToDo extends Model implements Arrayable
     public function toArray(): array
     {
         return [
-            'user_id'    => $this->user_id,
-            'title'      => $this->title,
-            'body'       => $this->body,
-            'due_date'   => $this->due_date,
-            'remind_at'  => $this->remind_at,
-            'complete'   => $this->complete,
-            'image'      => $this->image,
             'attachment' => $this->attachment,
+            'body'       => $this->body,
+            'complete'   => $this->complete,
+            'due_date'   => $this->due_date,
+            'id'         => $this->id,
+            'image'      => $this->image,
+            'remind_at'  => $this->remind_at,
+            'title'      => $this->title,
+            'user_id'    => $this->user_id,
         ];
     }
 }

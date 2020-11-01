@@ -1,9 +1,9 @@
 <template>
     <div
             :class="{ 'is-active' : isActive }"
-            class="modal"
             aria-labelledby=""
             aria-hidden="true"
+            class="modal"
             id="input-modal"
             role="dialog"
             tabindex="-1"
@@ -11,8 +11,14 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Create a To Do</h5>
-                    <button @click="closeModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <h5 class="modal-title">{{ modalTitle }}</h5>
+                    <button
+                        @click="closeModal"
+                        aria-label="Close"
+                        class="close"
+                        data-dismiss="modal"
+                        type="button"
+                    >
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -26,12 +32,12 @@
                                     </div>
                                     <div class="col-9">
                                         <input
-                                            v-model="todo.title"
                                             @keydown="clearError('title')"
-                                            type="text"
+                                            v-model="todo.title"
                                             class="form-control"
                                             id="title"
-                                            placeholder="Give your To Do a name"
+                                            placeholder="What do you need to do?"
+                                            type="text"
                                         >
                                         <span v-if="errors.title" class="error">{{ errors.title }}</span>
                                     </div>
@@ -45,9 +51,9 @@
                                             @keydown="clearError('body')"
                                             v-model="todo.body"
                                             class="form-control"
-                                            rows="3"
                                             id="details"
                                             placeholder="Additional info"
+                                            rows="3"
                                         ></textarea>
                                         <span v-if="errors.body" class="error">{{ errors.body }}</span>
                                     </div>
@@ -60,9 +66,9 @@
                                         <input
                                             @focus="clearError('dueDate')  "
                                             v-model="todo.dueDate"
-                                            type="date"
                                             class="form-control"
                                             id="due_date"
+                                            type="date"
                                         >
                                         <span v-if="errors.dueDate" class="error">{{ errors.dueDate }}</span>
                                     </div>
@@ -72,28 +78,61 @@
                                         <label for="remind_at">Remind me:</label>
                                     </div>
                                     <div class="col-9">
-                                        <select @change="clearError('remindAt')" v-model="todo.remindAt" id="remind_at" class="form-control">
-                                            <option value="" disabled selected>Never</option>
-                                            <option v-for="(reminderDay, value) in reminderDays" :value="value">{{ reminderDay }}</option>
+                                        <select
+                                            @change="clearError('remindAt')"
+                                            v-model="todo.remindAt"
+                                            class="form-control"
+                                            id="remind_at"
+                                        >
+                                            <option value="" selected>Never</option>
+                                            <option v-for="(reminderDay, value) in reminderDays" :value="value" :key="value">{{ reminderDay }}</option>
                                         </select>
                                         <span v-if="errors.remindAt" class="error">{{ errors.remindAt }}</span>
                                     </div>
                                 </div>
-                                <div class="row margin-btm-sm">
+                                <div v-if="isEditing && activeToDo.image" class="row margin-btm-sm">
                                     <div class="col-3 label">
                                         <label for="image">Image:</label>
                                     </div>
-                                    <div class="col-9">
-                                        <input @change="selectFile('image')" @focus="clearError('image')" type="file" id="image" accept="image/*">
-                                        <span v-if="errors.image" class="error">{{ errors.image }}</span>
+                                    <div v-if="activeToDo.image" class="col-9 margin-btm-sm">
+                                        <img :src="activeToDo.image" class="todo-image round-image modal-header-image" alt="image">
                                     </div>
                                 </div>
                                 <div class="row margin-btm-sm">
                                     <div class="col-3 label">
-                                        <label for="file">Attachment:</label>
+                                        <label for="image">{{ imageLabel }}</label>
                                     </div>
                                     <div class="col-9">
-                                        <input @change="selectFile('file')" type="file" id="file">
+                                        <input
+                                            @change="selectFile('image')"
+                                            @focus="clearError('image')"
+                                            accept="image/*"
+                                            id="image"
+                                            type="file"
+                                        >
+                                        <span v-if="errors.image" class="error">{{ errors.image }}</span>
+                                    </div>
+                                </div>
+                                <div v-if="isEditing && activeToDo.attachment" class="row margin-btm-sm">
+                                    <div class="col-3 label">
+                                        <label for="attachment">Attachment:</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <p id="attachment">
+                                            <a :href="activeToDo.attachment.file_path" target="_blank" title="Download">{{ activeToDo.attachment.display_name }}</a>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row margin-btm-sm">
+                                    <div class="col-3 label">
+                                        <label for="file">{{ attachmentLabel }}</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input
+                                            @change="selectFile('file')"
+                                            id="file"
+                                            type="file"
+                                        >
                                         <span v-if="errors.attachment" class="error">{{ errors.attachment }}</span>
                                     </div>
                                 </div>
@@ -114,7 +153,7 @@
                         class="btn btn-success"
                         type="button"
                     >
-                        Create
+                        {{ submitButtonText }}
                     </button>
                 </div>
             </div>
@@ -127,17 +166,22 @@ import { EventBus } from "../../eventbus/event-bus";
 import moment from '../../../../node_modules/moment';
 
 const STORE_TO_DO_ROUTE = '/api/store-to-do/';
+const EDIT_TO_DO_ROUTE = '/api/edit-to-do/';
 const GET_REMINDER_DAYS_ROUTE = '/api/get-reminder-days';
 
 export default {
     props: {
+        activeToDo: {
+            type: Object,
+            default: null,
+        },
         isActive: {
             type: Boolean,
             default: false
         },
         userId: {
             type: Number,
-        },
+        }
     },
     mounted() {
         this.$nextTick(function () {
@@ -146,49 +190,79 @@ export default {
     },
     data() {
         return {
-            todo: {
-                title: '',
-                body: '',
-                dueDate: null,
-                remindAt: "",
-                image: null,
-                attachment: null,
-            },
+            isEditing: false,
             errors: {
-                title: '',
+                attachment: '',
                 body: '',
                 dueDate: '',
-                remindAt: '',
                 image: '',
-                attachment: '',
+                remindAt: '',
+                title: '',
             },
             reminderDays: {},
+            todo: {
+                attachment: null,
+                body: '',
+                dueDate: null,
+                id: null,
+                image: null,
+                remindAt: "",
+                title: '',
+            },
         }
     },
     computed: {
+        attachmentLabel() {
+            return this.isEditing && this.activeToDo.attachment ? "Change:" : "Attachment";
+        },
+        dueDate() {
+            return this.todo.dueDate;
+        },
+        imageLabel() {
+            return this.isEditing && this.activeToDo.image ? "Change:" : "Image:";
+        },
+        modalTitle() {
+            return this.isEditing ? "Edit To Do" : "Create a To Do";
+        },
         shouldShowReminder() {
             const today = moment().format('YYYY-MM-DD');
             return this.todo.dueDate &&
                 this.todo.dueDate > today;
         },
-        dueDate() {
-            return this.todo.dueDate;
+        submitButtonText() {
+            return this.isEditing ? "Edit" : "Create";
         }
     },
     watch: {
+        activeToDo: function(val) {
+            if (val) {
+                this.isEditing = true;
+                if (this.$props.activeToDo.remind_at) {
+                    this.todo.remindAt = moment(this.$props.activeToDo.due_date).diff(moment(this.$props.activeToDo.remind_at), 'days');
+                }
+                this.todo.body = this.$props.activeToDo.body;
+                this.todo.dueDate = this.$props.activeToDo.due_date;
+                this.todo.existingAttachment = this.$props.activeToDo.attachment ? this.$props.activeToDo.attachment.display_name : {};
+                this.todo.existingImage = this.$props.activeToDo.image;
+                this.todo.id = this.$props.activeToDo.id;
+                this.todo.title = this.$props.activeToDo.title;
+            } else {
+                this.isEditing = false;
+            }
+        },
         dueDate: function (val) {
             if (val === null || val === "") this.todo.remindAt = "";
         },
     },
     methods: {
-        clearError(error) {
-            this.errors[error] = '';
-        },
         clearAllErrors() {
             const errorObj = this.errors;
             for (const key of Object.keys(errorObj)) {
                 this.errors[key] = '';
             }
+        },
+        clearError(error) {
+            this.errors[error] = '';
         },
         clearFields() {
             const fieldObj = this.todo;
@@ -205,9 +279,6 @@ export default {
             axios.get(GET_REMINDER_DAYS_ROUTE)
                 .then(response => {
                     this.reminderDays = response.data;
-                })
-                .catch(errors => {
-
                 })
         },
         reminderIsInTheFuture() {
@@ -233,7 +304,16 @@ export default {
                     }
                 );
 
-                axios.post(STORE_TO_DO_ROUTE+this.$props.userId, formData)
+                let method = 'get';
+                let route = STORE_TO_DO_ROUTE;
+
+                if (this.isEditing) {
+                    method = 'post';
+                    route = `${EDIT_TO_DO_ROUTE}${this.todo.id}/`;
+                    formData.append('_method', 'PUT')
+                }
+
+                axios[method](`${route}${this.$props.userId}`, formData)
                     .then(response => {
                         this.closeModal();
                         EventBus.$emit('update-todos', response.data);
