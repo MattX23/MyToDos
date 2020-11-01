@@ -66,7 +66,7 @@ class ToDoController extends Controller
 
         $this->removeOldUploads($toDo, $image, $attachment);
 
-        $imageName = $image ? $this->storeImage($image, $user) : null;
+        $imageName = $image ? $this->storeImage($image, $user) : $toDo->image;
 
         $toDo->update([
             'title'     => $request->get('title'),

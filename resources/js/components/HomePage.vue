@@ -13,7 +13,7 @@
         <modal-view-todo
             :user-id="userId"
             :is-active="isViewTodoModalActive"
-            :todo="activeTodo"
+            :todo="activeTodoView"
         ></modal-view-todo>
     </div>
 </template>
@@ -29,6 +29,8 @@ export default {
         EventBus.$on('close-modal', () => {
             this.isAddTodoModalActive = false;
             this.isViewTodoModalActive = false;
+            this.activeTodo = null;
+            this.activeTodoView = null;
             this.isBlurred = false;
         });
         EventBus.$on('modal-open-add-todo', (todo) => {
@@ -38,7 +40,7 @@ export default {
        });
         EventBus.$on('modal-open-view-todo', (todo) => {
             this.isViewTodoModalActive = true;
-            this.activeTodo = todo;
+            this.activeTodoView = todo;
             this.isBlurred = true;
         });
         EventBus.$on('update-todos', (todos) => {
@@ -52,6 +54,7 @@ export default {
     data() {
         return {
             activeTodo: null,
+            activeTodoView: null,
             complete: [],
             incomplete: [],
             isAddTodoModalActive: false,

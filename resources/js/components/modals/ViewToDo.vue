@@ -71,7 +71,7 @@
                                                     {{ todo.due_date }}
                                                 </p>
                                                 <p v-else>
-                                                    No Due Date Set.
+                                                    Not set.
                                                 </p>
                                             </div>
                                         </div>
@@ -86,7 +86,7 @@
                                                     {{ todo.remind_at }}
                                                 </p>
                                                 <p v-else>
-                                                    None Set.
+                                                    Not set.
                                                 </p>
                                             </div>
                                         </div>
