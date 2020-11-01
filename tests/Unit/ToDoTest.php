@@ -232,7 +232,6 @@ class ToDoTest extends TestCase
             'image' => UploadedFile::fake()->create('image2.png')
         ]);
 
-
         Storage::disk('local')->assertMissing('public/images/'.md5('image.png'.$this->user->id).'.png');
     }
 
@@ -251,7 +250,6 @@ class ToDoTest extends TestCase
             'title'      => 'Test To Do',
             'attachment' => UploadedFile::fake()->create('file2.pdf')
         ]);
-
 
         Storage::disk('local')->assertMissing('public/attachments/'.md5('file.pdf'.$this->user->id).'.pdf');
     }
