@@ -7,45 +7,17 @@ body {
     background-size: cover;
 }
 
-.small-text {
-    font-size: $font-size-sm;
+button, input {
+    overflow: auto;
 }
 
-.btn-round {
-    border-radius: 25px;
-    width: 30px;
-    height: 30px;
+.blurred {
+    filter: blur(4px);
+    -webkit-filter: blur(4px);
 }
 
-.btn-pill {
-    width: 90px;
-    font-size: 0.55rem;
-    height: 30px;
-    margin-top: 5px;
-}
-
-.btn-secondary-dim {
-    background: $transparent-grey;
-    color: $white;
-    border: none;
-}
-
-.inactive-btn-warning:hover {
-    background-color: $yellow;
-    border-color: $yellow;
-    cursor: default !important;
-}
-
-.inactive-btn-info:hover {
-    background-color: $blue;
-    border-color: $blue;
-    cursor: default !important;
-}
-
-.inactive-btn-danger:hover {
-    background-color: $red;
-    border-color: $red;
-    cursor: default !important;
+.close {
+    cursor: pointer;
 }
 
 .drop-shadow {
@@ -54,44 +26,11 @@ body {
     box-shadow: 6px 3px 12px -5px rgba(0,0,0,0.75);
 }
 
-.is-active {
-    display: block;
-    opacity: 1;
-}
-
-.blurred {
-    filter: blur(4px);
-    -webkit-filter: blur(4px);
-}
-
-.margin-btm-sm {
-    margin-bottom: 5px;
-}
-
 .error {
     display: inline-block;
     font-size: 0.75rem;
     color: red;
     margin-left: 3px;
-}
-
-button, input {
-    overflow: auto;
-}
-
-.round-image {
-    width: 65px;
-    height: 65px;
-    border-radius: 100px;
-}
-
-.margin-left {
-    margin-left: 20px;
-}
-
-.modal-body p {
-    margin-top: 7px;
-    margin-bottom: 0;
 }
 
 .image-placeholder {
@@ -104,6 +43,30 @@ button, input {
     float: right;
 }
 
-.close {
-    cursor: pointer;
+.is-active {
+    display: block;
+    opacity: 1;
+}
+
+.margin-btm-sm {
+    margin-bottom: 5px;
+}
+
+.margin-left {
+    margin-left: 20px;
+}
+
+.modal-body p {
+    margin-top: 7px;
+    margin-bottom: 0;
+}
+
+.round-image {
+    width: 65px;
+    height: 65px;
+    border-radius: 100px;
+}
+
+.small-text {
+    font-size: $font-size-sm;
 }
