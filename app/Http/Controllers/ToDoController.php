@@ -11,6 +11,7 @@ use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ToDoController extends Controller
@@ -22,7 +23,7 @@ class ToDoController extends Controller
      */
     public function get(User $user): JsonResponse
     {
-        return $this->apiResponse($this->getTodos($user));
+        return $this->apiResponse($this->getToDos($user));
     }
 
     /**
@@ -36,22 +37,24 @@ class ToDoController extends Controller
         $image = $request->file('image');
         $attachment = $request->file('attachment');
 
-        $imageName = $image ? $this->storeImage($image, $user) : null;
+        DB::transaction(function() use ($image, $attachment, $request, $user) {
+            $imageName = $image ? $this->storeImage($image, $user) : null;
 
-        $toDo = ToDo::create([
-            'user_id'   => $user->id,
-            'title'     => $request->get('title'),
-            'body'      => $request->get('body'),
-            'due_date'  => $request->get('dueDate'),
-            'remind_at' => $request->get('remindAt'),
-            'image'     => $imageName,
-        ]);
+            $toDo = ToDo::create([
+                'user_id'   => $user->id,
+                'title'     => $request->get('title'),
+                'body'      => $request->get('body'),
+                'due_date'  => $request->get('dueDate'),
+                'remind_at' => $request->get('remindAt'),
+                'image'     => $imageName,
+            ]);
 
-        if ($attachment) {
-            $this->storeAttachment($attachment, $toDo);
-        }
+            if ($attachment) {
+                $this->storeAttachment($attachment, $toDo);
+            }
+        });
 
-        return $this->apiResponse($this->getTodos($user));
+        return $this->apiResponse($this->getToDos($user));
     }
 
     /**
@@ -67,23 +70,25 @@ class ToDoController extends Controller
         $image = $request->file('image');
         $attachment = $request->file('attachment');
 
-        $this->removeExistingUploads($toDo, (bool) $image, (bool) $attachment);
+        DB::transaction(function() use ($toDo, $image, $attachment, $request, $user) {
+            $this->removeExistingUploads($toDo, (bool) $image, (bool) $attachment);
 
-        $imageName = $image ? $this->storeImage($image, $user) : $toDo->image;
+            $imageName = $image ? $this->storeImage($image, $user) : $toDo->image;
 
-        $toDo->update([
-            'title'     => $request->get('title'),
-            'body'      => $request->get('body'),
-            'due_date'  => $request->get('dueDate'),
-            'remind_at' => $request->get('remindAt'),
-            'image'     => $imageName,
-        ]);
+            $toDo->update([
+                'title'     => $request->get('title'),
+                'body'      => $request->get('body'),
+                'due_date'  => $request->get('dueDate'),
+                'remind_at' => $request->get('remindAt'),
+                'image'     => $imageName,
+            ]);
 
-        if ($attachment) {
-            $this->storeAttachment($attachment, $toDo);
-        }
+            if ($attachment) {
+                $this->storeAttachment($attachment, $toDo);
+            }
+        });
 
-        return $this->apiResponse($this->getTodos($user));
+        return $this->apiResponse($this->getToDos($user));
     }
 
     /**
@@ -96,15 +101,13 @@ class ToDoController extends Controller
      */
     public function delete(ToDo $toDo, User $user, DeleteToDo $request): JsonResponse
     {
-        $this->removeExistingUploads($toDo, (bool) $toDo->image, (bool) $toDo->attachment()->exists());
+        DB::transaction(function() use ($toDo) {
+            $this->removeExistingUploads($toDo, (bool) $toDo->image, (bool) $toDo->attachment()->exists());
 
-        if ($toDo->attachment) {
-            $toDo->attachment->delete();
-        }
+            $toDo->delete();
+        });
 
-        $toDo->delete();
-
-        return $this->apiResponse($this->getTodos($user));
+        return $this->apiResponse($this->getToDos($user));
     }
 
     /**
@@ -112,7 +115,7 @@ class ToDoController extends Controller
      *
      * @return array
      */
-    public function getTodos(User $user): array
+    public function getToDos(User $user): array
     {
         $toDos = $user->toDos->groupby('complete');
 

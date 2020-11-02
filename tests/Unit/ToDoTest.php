@@ -199,9 +199,7 @@ class ToDoTest extends TestCase
 
     public function testUserCannotEditAnotherUsersToDo()
     {
-        $newUser = factory(User::class, 1)
-            ->create()
-            ->first();
+        $newUser = $this->getNewTestUser();
 
         $toDo = ToDo::create([
             'user_id' => $newUser->id,
@@ -252,5 +250,28 @@ class ToDoTest extends TestCase
         ]);
 
         Storage::disk('local')->assertMissing('public/attachments/'.md5('file.pdf'.$this->user->id).'.pdf');
+    }
+
+    public function testDeleteToDo()
+    {
+        $toDo = ToDo::first();
+
+        $response = $this->delete( '/api/delete-to-do/'.$toDo->id.'/'.$this->user->id);
+
+        $this->assertMatchesJsonSnapshot($response->getContent());
+    }
+
+    public function testUserCannotDeleteAnotherUsersToDo()
+    {
+        $newUser = $this->getNewTestUser();
+
+        $toDo = ToDo::create([
+            'user_id' => $newUser->id,
+            'title'   => 'New Users To Do',
+        ]);
+
+        $response = $this->delete( '/api/delete-to-do/'.$toDo->id.'/'.$this->user->id);
+
+        $response->assertStatus(403);
     }
 }
