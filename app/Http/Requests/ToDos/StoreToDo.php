@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\ToDos;
 
 use App\ToDo;
 use App\Traits\ToDoRequestTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateToDo extends FormRequest
+class StoreToDo extends FormRequest
 {
     use ToDoRequestTrait;
 
@@ -15,9 +15,9 @@ class UpdateToDo extends FormRequest
      *
      * @return bool
      */
-    public function authorize(): bool
+    public function authorize()
     {
-        return $this->userIsAuthorised();
+        return true;
     }
 
     /**

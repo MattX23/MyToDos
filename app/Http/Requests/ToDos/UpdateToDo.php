@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\ToDos;
 
+use App\ToDo;
 use App\Traits\ToDoRequestTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
-class DeleteToDo extends FormRequest
+class UpdateToDo extends FormRequest
 {
     use ToDoRequestTrait;
 
@@ -24,8 +25,8 @@ class DeleteToDo extends FormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules()
     {
-        return [];
+        return ToDo::RULES;
     }
 }

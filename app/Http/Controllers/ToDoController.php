@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Attachment;
-use App\Http\Requests\DeleteToDo;
-use App\Http\Requests\StoreToDo;
-use App\Http\Requests\UpdateToDo;
+use App\Http\Requests\ToDos\DeleteToDo;
+use App\Http\Requests\ToDos\StoreToDo;
+use App\Http\Requests\ToDos\UpdateToDo;
 use App\ToDo;
 use App\User;
 use Illuminate\Http\JsonResponse;
@@ -26,8 +26,8 @@ class ToDoController extends Controller
     }
 
     /**
-     * @param \App\User                    $user
-     * @param \App\Http\Requests\StoreToDo $request
+     * @param \App\User                          $user
+     * @param \App\Http\Requests\ToDos\StoreToDo $request
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -55,9 +55,9 @@ class ToDoController extends Controller
     }
 
     /**
-     * @param \App\ToDo                     $toDo
-     * @param \App\User                     $user
-     * @param \App\Http\Requests\UpdateToDo $request
+     * @param \App\ToDo                           $toDo
+     * @param \App\User                           $user
+     * @param \App\Http\Requests\ToDos\UpdateToDo $request
      *
      * @throws \Exception
      * @return \Illuminate\Http\JsonResponse
@@ -87,9 +87,9 @@ class ToDoController extends Controller
     }
 
     /**
-     * @param \App\ToDo                     $toDo
-     * @param \App\User                     $user
-     * @param \App\Http\Requests\DeleteToDo $request
+     * @param \App\ToDo                           $toDo
+     * @param \App\User                           $user
+     * @param \App\Http\Requests\ToDos\DeleteToDo $request
      *
      * @throws \Exception
      * @return \Illuminate\Http\JsonResponse
