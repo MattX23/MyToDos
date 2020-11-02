@@ -15,6 +15,11 @@
             :is-active="isViewTodoModalActive"
             :todo="activeTodoView"
         ></modal-view-todo>
+        <modal-delete-todo
+            :user-id="userId"
+            :is-active="isDeleteTodoModalActive"
+            :todo="activeTodoDelete"
+        ></modal-delete-todo>
     </div>
 </template>
 
@@ -28,8 +33,10 @@ export default {
     created() {
         EventBus.$on('close-modal', () => {
             this.isAddTodoModalActive = false;
+            this.isDeleteTodoModalActive = false;
             this.isViewTodoModalActive = false;
             this.activeTodo = null;
+            this.activeTodoDelete = null;
             this.activeTodoView = null;
             this.isBlurred = false;
         });
@@ -38,6 +45,11 @@ export default {
             this.activeTodo = todo;
             this.isBlurred = true;
        });
+        EventBus.$on('modal-open-delete-todo', (todo) => {
+            this.isDeleteTodoModalActive = true;
+            this.activeTodoDelete = todo;
+            this.isBlurred = true;
+        });
         EventBus.$on('modal-open-view-todo', (todo) => {
             this.isViewTodoModalActive = true;
             this.activeTodoView = todo;
@@ -54,10 +66,12 @@ export default {
     data() {
         return {
             activeTodo: null,
+            activeTodoDelete: null,
             activeTodoView: null,
             complete: [],
             incomplete: [],
             isAddTodoModalActive: false,
+            isDeleteTodoModalActive: false,
             isBlurred: false,
             isViewTodoModalActive: false,
         }

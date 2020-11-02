@@ -74,6 +74,7 @@
                                     <i class="zmdi zmdi-time"></i>
                                 </button>
                                 <button
+                                    @click="openDeleteToDoModal(todo)"
                                     class="btn btn-sm btn-round btn-secondary"
                                     title="Delete To Do"
                                 >
@@ -108,6 +109,9 @@ export default {
         },
         isOverDue(dueDate) {
             return moment(dueDate).isBefore();
+        },
+        openDeleteToDoModal(todo) {
+            EventBus.$emit('modal-open-delete-todo', todo);
         },
         openInputToDoModal(todo = null) {
             EventBus.$emit('modal-open-add-todo', todo);
