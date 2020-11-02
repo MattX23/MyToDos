@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Attachment;
+use App\Http\Requests\DeleteToDo;
 use App\Http\Requests\StoreToDo;
 use App\Http\Requests\UpdateToDo;
 use App\ToDo;
@@ -46,7 +47,9 @@ class ToDoController extends Controller
             'image'     => $imageName,
         ]);
 
-        if ($attachment) $this->storeAttachment($attachment, $toDo);
+        if ($attachment) {
+            $this->storeAttachment($attachment, $toDo);
+        }
 
         return $this->apiResponse($this->getTodos($user));
     }
@@ -64,7 +67,7 @@ class ToDoController extends Controller
         $image = $request->file('image');
         $attachment = $request->file('attachment');
 
-        $this->removeOldUploads($toDo, $image, $attachment);
+        $this->removeExistingUploads($toDo, (bool) $image, (bool) $attachment);
 
         $imageName = $image ? $this->storeImage($image, $user) : $toDo->image;
 
@@ -76,7 +79,30 @@ class ToDoController extends Controller
             'image'     => $imageName,
         ]);
 
-        if ($attachment) $this->storeAttachment($attachment, $toDo);
+        if ($attachment) {
+            $this->storeAttachment($attachment, $toDo);
+        }
+
+        return $this->apiResponse($this->getTodos($user));
+    }
+
+    /**
+     * @param \App\ToDo                     $toDo
+     * @param \App\User                     $user
+     * @param \App\Http\Requests\DeleteToDo $request
+     *
+     * @throws \Exception
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function delete(ToDo $toDo, User $user, DeleteToDo $request): JsonResponse
+    {
+        $this->removeExistingUploads($toDo, (bool) $toDo->image, (bool) $toDo->attachment()->exists());
+
+        if ($toDo->attachment) {
+            $toDo->attachment->delete();
+        }
+
+        $toDo->delete();
 
         return $this->apiResponse($this->getTodos($user));
     }
@@ -105,13 +131,13 @@ class ToDoController extends Controller
     }
 
     /**
-     * @param \App\ToDo                          $toDo
-     * @param \Illuminate\Http\UploadedFile|null $image
-     * @param \Illuminate\Http\UploadedFile|null $attachment
+     * @param \App\ToDo $toDo
+     * @param bool      $image
+     * @param bool      $attachment
      *
      * @throws \Exception
      */
-    protected function removeOldUploads(ToDo $toDo, ?UploadedFile $image, ?UploadedFile $attachment): void
+    protected function removeExistingUploads(ToDo $toDo, bool $image, bool $attachment): void
     {
         if ($image && $toDo->image) $this->removeUpload(
             ToDo::IMAGE_DISPLAY_PATH,
@@ -151,7 +177,11 @@ class ToDoController extends Controller
      */
     protected function storeImage(UploadedFile $image, User $user): string
     {
-        $storageName = $this->getUploadName($image->getClientOriginalName(), $image->getClientOriginalExtension(), $user->id);
+        $storageName = $this->getUploadName(
+            $image->getClientOriginalName(),
+            $image->getClientOriginalExtension(),
+            $user->id
+        );
         $storagePath = Storage::putFileAs(ToDo::IMAGE_FILE_PATH, $image, $storageName);
 
         return ToDo::IMAGE_DISPLAY_PATH.basename($storagePath);
@@ -163,7 +193,11 @@ class ToDoController extends Controller
      */
     protected function storeAttachment(UploadedFile $attachment, ToDo $toDo): void
     {
-        $storageName = $this->getUploadName($attachment->getClientOriginalName(), $attachment->getClientOriginalExtension(), $toDo->user->id);
+        $storageName = $this->getUploadName(
+            $attachment->getClientOriginalName(),
+            $attachment->getClientOriginalExtension(),
+            $toDo->user->id
+        );
         $storagePath = Storage::putFileAs(Attachment::ATTACHMENT_FILE_PATH, $attachment, $storageName);
         $attachmentDisplayPath = str_replace('public', '', $storagePath);
 

@@ -2,11 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\ToDo;
 use App\Traits\ToDoRequestTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateToDo extends FormRequest
+class DeleteToDo extends FormRequest
 {
     use ToDoRequestTrait;
 
@@ -25,8 +24,8 @@ class UpdateToDo extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
-        return ToDo::RULES;
+        return [];
     }
 }

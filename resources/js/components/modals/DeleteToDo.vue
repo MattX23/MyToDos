@@ -78,7 +78,11 @@ export default {
             EventBus.$emit('close-modal');
         },
         deleteToDo() {
-            //
+            axios.delete(`${DELETE_TO_DO_ROUTE}${this.$props.todo.id}/${this.$props.userId}`)
+                .then(response => {
+                    this.closeModal();
+                    EventBus.$emit('update-todos', response.data);
+                })
         },
     }
 }
