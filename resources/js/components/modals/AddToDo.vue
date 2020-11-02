@@ -304,16 +304,14 @@ export default {
                     }
                 );
 
-                let method = 'get';
                 let route = STORE_TO_DO_ROUTE;
 
                 if (this.isEditing) {
-                    method = 'post';
                     route = `${EDIT_TO_DO_ROUTE}${this.todo.id}/`;
                     formData.append('_method', 'PUT')
                 }
 
-                axios[method](`${route}${this.$props.userId}`, formData)
+                axios.post(`${route}${this.$props.userId}`, formData)
                     .then(response => {
                         this.closeModal();
                         EventBus.$emit('update-todos', response.data);

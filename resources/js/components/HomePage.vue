@@ -82,7 +82,7 @@ export default {
                 .then(response => {
                     this.complete = response.data.complete;
                     this.incomplete = response.data.incomplete;
-                })
+                });
         }
     }
 }

@@ -72,6 +72,15 @@ class ToDo extends Model implements Arrayable
         return $this->hasOne(Attachment::class);
     }
 
+    public static function boot() : void
+    {
+        parent::boot();
+
+        static::deleting(function(ToDo $toDo) {
+            $toDo->attachment()->delete();
+        });
+    }
+
     /**
      * @return array
      */

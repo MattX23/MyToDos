@@ -26,6 +26,16 @@ trait TestSetupTrait
         return $this;
     }
 
+    /**
+     * @return \App\User
+     */
+    protected function getNewTestUser(): User
+    {
+        return factory(User::class, 1)
+            ->create()
+            ->first();
+    }
+
     protected function logUserIn(): void
     {
         $this->actingAs($this->user);

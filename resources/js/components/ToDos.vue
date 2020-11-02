@@ -60,26 +60,15 @@
                                     <i class="zmdi zmdi-edit"></i>
                                 </button>
                                 <button
-                                    :class="[ hasAttachment(todo) ? 'btn-secondary' : 'btn-secondary-dim' ]"
-                                    class="btn btn-sm btn-round"
-                                    title="Attachments"
-                                >
-                                    <i class="zmdi zmdi-attachment-alt"></i>
-                                </button>
-                                <button
-                                    :class="[ hasReminder(todo) ? 'btn-secondary' : 'btn-secondary-dim' ]"
-                                    class="btn btn-sm btn-secondary btn-round"
-                                    title="Reminder"
-                                >
-                                    <i class="zmdi zmdi-time"></i>
-                                </button>
-                                <button
                                     @click="openDeleteToDoModal(todo)"
                                     class="btn btn-sm btn-round btn-secondary"
                                     title="Delete To Do"
                                 >
                                     <i class="zmdi zmdi-delete"></i>
                                 </button>
+                                <span v-if="hasAttachment(todo)" class="has-attachment">
+                                    <i class="zmdi zmdi-attachment-alt"></i>
+                                </span>
                             </div>
                         </div>
                     </article>
@@ -103,9 +92,6 @@ export default {
     methods: {
         hasAttachment(todo) {
             return todo.attachment;
-        },
-        hasReminder(todo) {
-            return todo.remind_at;
         },
         isOverDue(dueDate) {
             return moment(dueDate).isBefore();
@@ -189,5 +175,10 @@ header {
     cursor: pointer;
     border-radius: 10px;
     font-size: 1.5rem;
+}
+.has-attachment {
+    font-size: 1.2rem;
+    position: relative;
+    top: 2px;
 }
 </style>

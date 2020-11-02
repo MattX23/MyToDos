@@ -22,7 +22,7 @@ class ToDoController extends Controller
      */
     public function get(User $user): JsonResponse
     {
-        return $this->apiResponse($this->getTodos($user));
+        return $this->apiResponse($this->getToDos($user));
     }
 
     /**
@@ -51,7 +51,7 @@ class ToDoController extends Controller
             $this->storeAttachment($attachment, $toDo);
         }
 
-        return $this->apiResponse($this->getTodos($user));
+        return $this->apiResponse($this->getToDos($user));
     }
 
     /**
@@ -83,7 +83,7 @@ class ToDoController extends Controller
             $this->storeAttachment($attachment, $toDo);
         }
 
-        return $this->apiResponse($this->getTodos($user));
+        return $this->apiResponse($this->getToDos($user));
     }
 
     /**
@@ -98,13 +98,9 @@ class ToDoController extends Controller
     {
         $this->removeExistingUploads($toDo, (bool) $toDo->image, (bool) $toDo->attachment()->exists());
 
-        if ($toDo->attachment) {
-            $toDo->attachment->delete();
-        }
-
         $toDo->delete();
 
-        return $this->apiResponse($this->getTodos($user));
+        return $this->apiResponse($this->getToDos($user));
     }
 
     /**
@@ -112,7 +108,7 @@ class ToDoController extends Controller
      *
      * @return array
      */
-    public function getTodos(User $user): array
+    public function getToDos(User $user): array
     {
         $toDos = $user->toDos->groupby('complete');
 
