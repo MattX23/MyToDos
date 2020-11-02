@@ -57,13 +57,13 @@
         },
         {
             "attachment": null,
-            "body": null,
+            "body": "A new To Do body",
             "complete": "0",
             "due_date": null,
             "id": 12,
-            "image": "\/images\/f2415dbda025cef1eb824d7949f1a685.jpg",
+            "image": null,
             "remind_at": null,
-            "title": "To Do with Image",
+            "title": "A new To Do Title",
             "user_id": "1"
         }
     ],

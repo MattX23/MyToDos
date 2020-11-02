@@ -2,24 +2,24 @@
     <div class="col-sm-6">
         <header>In Progress ({{ todos.length }})
             <span
-                    @click="openAddToDoModal"
-                    id="addToDo"
-                    class="drop-shadow"
+                @click="openInputToDoModal()"
+                class="drop-shadow"
+                id="addToDo"
             >+</span>
         </header>
         <div class="row">
             <div class="col-12 todo-container">
                 <div v-for="todo in todos">
                     <article
-                            :key="todo.id"
-                            class="todo-item"
+                        :key="todo.id"
+                        class="todo-item"
                     >
                         <div class="row">
                             <div class="col-10">
-                        <span id="todo-header">
-                            <input type="checkbox">
-                            <span id="todo-header-text">{{ todo.title }}</span>
-                        </span>
+                                <span id="todo-header">
+                                    <input type="checkbox">
+                                    <span id="todo-header-text">{{ todo.title }}</span>
+                                </span>
                                 <div class="row">
                                     <div class="d-none d-lg-block col-6" v-if="todo.due_date">
                                         <div
@@ -51,6 +51,13 @@
                                     title="View To Do"
                                 >
                                     <i class="zmdi zmdi-eye"></i>
+                                </button>
+                                <button
+                                    @click="openInputToDoModal(todo)"
+                                    class="btn btn-sm btn-round btn-secondary"
+                                    title="Edit To Do"
+                                >
+                                    <i class="zmdi zmdi-edit"></i>
                                 </button>
                                 <button
                                     :class="[ hasAttachment(todo) ? 'btn-secondary' : 'btn-secondary-dim' ]"
@@ -92,11 +99,6 @@ export default {
             default: null
         }
     },
-    data() {
-        return {
-
-        }
-    },
     methods: {
         hasAttachment(todo) {
             return todo.attachment;
@@ -107,8 +109,8 @@ export default {
         isOverDue(dueDate) {
             return moment(dueDate).isBefore();
         },
-        openAddToDoModal() {
-            EventBus.$emit('modal-open-add-todo');
+        openInputToDoModal(todo = null) {
+            EventBus.$emit('modal-open-add-todo', todo);
         },
         openViewToDoModal(todo) {
             EventBus.$emit('modal-open-view-todo', todo);

@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\ToDo;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
@@ -80,6 +82,18 @@ class ToDoTest extends TestCase
         $this->assertMatchesJsonSnapshot($response->getContent());
     }
 
+    public function testAttachmentIsUploaded()
+    {
+        Storage::fake('local');
+
+        $this->json('POST', '/api/store-to-do/'.$this->user->id, [
+            'title'      => 'Test To Do',
+            'attachment' => UploadedFile::fake()->create('file.pdf')
+        ]);
+
+        Storage::disk('local')->assertExists('public/attachments/'.md5('file.pdf'.$this->user->id).'.pdf');
+    }
+
     public function testStoreToDoWithOversizedAttachment()
     {
         Storage::fake('local');
@@ -106,6 +120,18 @@ class ToDoTest extends TestCase
         ]);
 
         $this->assertMatchesJsonSnapshot($response->getContent());
+    }
+
+    public function testImageIsUploaded()
+    {
+        Storage::fake('local');
+
+        $this->json('POST', '/api/store-to-do/'.$this->user->id, [
+            'title' => 'Test To Do',
+            'image' => UploadedFile::fake()->create('image.png')
+        ]);
+
+        Storage::disk('local')->assertExists('public/images/'.md5('image.png'.$this->user->id).'.png');
     }
 
     public function testStoreToDoWithOversizedImage()
@@ -153,5 +179,78 @@ class ToDoTest extends TestCase
         $response
             ->assertSessionHasErrors( 'remindAt')
             ->assertStatus(302);
+    }
+
+    public function testEditToDo()
+    {
+        $toDo = ToDo::create([
+            'user_id' => $this->user->id,
+            'title'   => 'Original title',
+            'body'    => 'The original To Do body',
+        ]);
+
+        $response = $this->put( '/api/edit-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'title'    => 'A new To Do Title',
+            'body'     => 'A new To Do body',
+        ]);
+
+        $this->assertMatchesJsonSnapshot($response->getContent());
+    }
+
+    public function testUserCannotEditAnotherUsersToDo()
+    {
+        $newUser = factory(User::class, 1)
+            ->create()
+            ->first();
+
+        $toDo = ToDo::create([
+            'user_id' => $newUser->id,
+            'title'   => 'New Users To Do',
+        ]);
+
+        $response = $this->put( '/api/edit-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'title'    => 'A new To Do Title',
+            'body'     => 'A new To Do body',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function testImageIsRemovedWhenNewImageUploaded()
+    {
+        Storage::fake('local');
+
+        $this->json('POST', '/api/store-to-do/'.$this->user->id, [
+            'title' => 'Test Image Removal To Do',
+            'image' => UploadedFile::fake()->create('image.png')
+        ]);
+
+        $toDo = ToDo::where('title', '=', 'Test Image Removal To Do')->first();
+
+        $this->json('PUT', '/api/edit-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'title' => 'Test To Do',
+            'image' => UploadedFile::fake()->create('image2.png')
+        ]);
+
+        Storage::disk('local')->assertMissing('public/images/'.md5('image.png'.$this->user->id).'.png');
+    }
+
+    public function testAttachmentIsRemovedWhenNewAttachmentUploaded()
+    {
+        Storage::fake('local');
+
+        $this->json('POST', '/api/store-to-do/'.$this->user->id, [
+            'title'      => 'Test Attachment Removal To Do',
+            'attachment' => UploadedFile::fake()->create('file.pdf')
+        ]);
+
+        $toDo = ToDo::where('title', '=', 'Test Attachment Removal To Do')->first();
+
+        $this->json('PUT', '/api/edit-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'title'      => 'Test To Do',
+            'attachment' => UploadedFile::fake()->create('file2.pdf')
+        ]);
+
+        Storage::disk('local')->assertMissing('public/attachments/'.md5('file.pdf'.$this->user->id).'.pdf');
     }
 }
