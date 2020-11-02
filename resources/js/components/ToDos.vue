@@ -9,7 +9,8 @@
         </header>
         <div class="row">
             <div class="col-12 todo-container">
-                <div v-for="todo in todos">
+                <div v-if="!todos.length" class="empty-container">You're all caught up!</div>
+                <div v-else v-for="todo in todos">
                     <article
                         :key="todo.id"
                         class="todo-item"
@@ -43,33 +44,31 @@
                                 <div class="image-placeholder round-image">{{ todo.title.substring(0, 1) }}</div>
                             </div>
                         </div>
-                        <div class="toolbar">
-                            <div class="toolbar-row">
-                                <button
+                        <div class="col-12 toolbar-row">
+                            <button
                                     @click="openViewToDoModal(todo)"
                                     class="btn btn-sm btn-round btn-secondary"
                                     title="View To Do"
-                                >
-                                    <i class="zmdi zmdi-eye"></i>
-                                </button>
-                                <button
+                            >
+                                <i class="zmdi zmdi-eye"></i>
+                            </button>
+                            <button
                                     @click="openInputToDoModal(todo)"
                                     class="btn btn-sm btn-round btn-secondary"
                                     title="Edit To Do"
-                                >
-                                    <i class="zmdi zmdi-edit"></i>
-                                </button>
-                                <button
+                            >
+                                <i class="zmdi zmdi-edit"></i>
+                            </button>
+                            <button
                                     @click="openDeleteToDoModal(todo)"
                                     class="btn btn-sm btn-round btn-secondary"
                                     title="Delete To Do"
-                                >
-                                    <i class="zmdi zmdi-delete"></i>
-                                </button>
-                                <span v-if="hasAttachment(todo)" class="has-attachment">
+                            >
+                                <i class="zmdi zmdi-delete"></i>
+                            </button>
+                            <span v-if="hasAttachment(todo)" class="has-attachment">
                                     <i class="zmdi zmdi-attachment-alt"></i>
                                 </span>
-                            </div>
                         </div>
                     </article>
                 </div>
@@ -112,15 +111,19 @@ export default {
 <style lang="scss" scoped>
 @import '../../sass/variables';
 
+.empty-container {
+    font-size: 1.5rem;
+    text-align: center;
+}
 .todo-container {
     background: $white-semi-transparent;
     padding-bottom: 30px;
+    height: 80vh;
     max-height: 80vh;
     overflow: scroll;
     padding-top: 10px;
 }
 .todo-item {
-    position: relative;
     background: $white;
     padding: 5px;
     margin-bottom: 10px;
@@ -134,11 +137,6 @@ header {
     font-size: 2rem;
     margin-bottom: 0.5rem;
 }
-.toolbar {
-    position: absolute;
-    bottom: 3px;
-    width: 100%;
-}
 #todo-dates {
     display: flex;
     justify-content: space-around;
@@ -148,10 +146,9 @@ header {
     justify-content: space-around;
     background: lightgray;
     position: relative;
-    right: 5px;
     top: 1px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    margin-top: 10px;
+    padding: 5px;
 }
 .todo-image{
     float: right;
