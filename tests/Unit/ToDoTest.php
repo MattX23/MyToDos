@@ -3,7 +3,6 @@
 namespace Tests\Unit;
 
 use App\ToDo;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
@@ -233,6 +232,25 @@ class ToDoTest extends TestCase
         Storage::disk('local')->assertMissing('public/images/'.md5('image.png'.$this->user->id).'.png');
     }
 
+    public function testImageIsRemovedWhenWhenUserDeletesImage()
+    {
+        Storage::fake('local');
+
+        $this->json('POST', '/api/store-to-do/'.$this->user->id, [
+            'title' => 'Test Image Removal To Do',
+            'image' => UploadedFile::fake()->create('image.jpg')
+        ]);
+
+        $toDo = ToDo::where('title', '=', 'Test Image Removal To Do')->first();
+
+        $this->json('PUT', '/api/edit-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'title'       => 'Test To Do',
+            'deleteImage' => true
+        ]);
+
+        Storage::disk('local')->assertMissing('public/attachments/'.md5('image.jpg'.$this->user->id).'.jpg');
+    }
+
     public function testAttachmentIsRemovedWhenNewAttachmentUploaded()
     {
         Storage::fake('local');
@@ -247,6 +265,25 @@ class ToDoTest extends TestCase
         $this->json('PUT', '/api/edit-to-do/'.$toDo->id.'/'.$this->user->id, [
             'title'      => 'Test To Do',
             'attachment' => UploadedFile::fake()->create('file2.pdf')
+        ]);
+
+        Storage::disk('local')->assertMissing('public/attachments/'.md5('file.pdf'.$this->user->id).'.pdf');
+    }
+
+    public function testAttachmentIsRemovedWhenWhenUserDeletesAttachment()
+    {
+        Storage::fake('local');
+
+        $this->json('POST', '/api/store-to-do/'.$this->user->id, [
+            'title'      => 'Test Attachment Removal To Do',
+            'attachment' => UploadedFile::fake()->create('file.pdf')
+        ]);
+
+        $toDo = ToDo::where('title', '=', 'Test Attachment Removal To Do')->first();
+
+        $this->json('PUT', '/api/edit-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'title'            => 'Test To Do',
+            'deleteAttachment' => true
         ]);
 
         Storage::disk('local')->assertMissing('public/attachments/'.md5('file.pdf'.$this->user->id).'.pdf');
