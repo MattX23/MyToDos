@@ -59,7 +59,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12">
+                            <div v-if="!todo.is_complete" class="col-12">
                                 <div class="row">
                                     <div class="col-5">
                                         <div class="row margin-btm-sm">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Attachment;
 use App\Http\Requests\ToDos\DeleteToDo;
 use App\Http\Requests\ToDos\StoreToDo;
+use App\Http\Requests\ToDos\ToggleToDo;
 use App\Http\Requests\ToDos\UpdateToDo;
 use App\ToDo;
 use App\User;
@@ -82,9 +83,7 @@ class ToDoController extends Controller
             'image'     => $imageName,
         ]);
 
-        if ($attachment) {
-            $this->storeAttachment($attachment, $toDo);
-        }
+        if ($attachment) $this->storeAttachment($attachment, $toDo);
 
         return $this->apiResponse($this->getToDos($user));
     }
@@ -119,6 +118,22 @@ class ToDoController extends Controller
             'incomplete' => isset($toDos[0]) ? $toDos[0] : [],
             'complete'   => isset($toDos[1]) ? $toDos[1] : [],
         ];
+    }
+
+    /**
+     * @param \App\ToDo                           $toDo
+     * @param \App\User                           $user
+     * @param \App\Http\Requests\ToDos\ToggleToDo $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleStatus(ToDo $toDo, User $user, ToggleToDo $request): JsonResponse
+    {
+        $toDo->update([
+           'is_complete' => $request->get('complete'),
+        ]);
+
+        return $this->apiResponse($this->getToDos($user));
     }
 
     /**

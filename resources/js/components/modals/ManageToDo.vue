@@ -302,6 +302,8 @@ export default {
                 .then(response => {
                     this.reminderDays = response.data;
                 })
+                //todo create alert
+                .catch(() => alert('something went wrong'));
         },
         reminderIsInTheFuture() {
             return moment().add(1, 'days').format('YYYY-MM-DD') <=

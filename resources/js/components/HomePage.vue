@@ -1,9 +1,17 @@
 <template>
     <div>
         <div :class="{'blurred' : isBlurred}" class="container">
-            <to-dos
-                :todos="incomplete"
-            ></to-dos>
+            <div class="row">
+                <to-dos
+                    :todos="incomplete"
+                    :user-id="userId"
+                ></to-dos>
+                <to-dos
+                    :todos="complete"
+                    :complete="true"
+                    :user-id="userId"
+                ></to-dos>
+            </div>
         </div>
         <modal-manage-todo
             :active-to-do="activeTodo"
@@ -87,7 +95,9 @@ export default {
                 .then(response => {
                     this.complete = response.data.complete;
                     this.incomplete = response.data.incomplete;
-                });
+                })
+                //todo create alert
+                .catch(() => alert('something went wrong'));
         }
     }
 }

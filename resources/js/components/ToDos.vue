@@ -1,7 +1,8 @@
 <template>
     <div class="col-sm-6">
-        <header>In Progress ({{ todos.length }})
+        <header>{{ headerText }}
             <span
+                v-if="!complete"
                 @click="openInputToDoModal()"
                 class="drop-shadow"
                 id="addToDo"
@@ -9,7 +10,7 @@
         </header>
         <div class="row">
             <div class="col-12 todo-container">
-                <div v-if="!todos.length" class="empty-container">You're all caught up!</div>
+                <div v-if="!todos.length" class="empty-container">{{ emptyContainerText }}</div>
                 <div v-else v-for="todo in todos">
                     <article
                         :key="todo.id"
@@ -18,10 +19,10 @@
                         <div class="row">
                             <div class="col-10">
                                 <span id="todo-header">
-                                    <input type="checkbox">
-                                    <span id="todo-header-text">{{ todo.title }}</span>
+                                    <input v-if="!complete" @click="toggleToDoStatus(todo.id, true)" type="checkbox">
+                                    <span id="todo-header-text" :class="{ 'strike-through' : complete }">{{ todo.title }}</span>
                                 </span>
-                                <div class="row">
+                                <div v-if="!complete" class="row">
                                     <div class="d-none d-lg-block col-6" v-if="todo.due_date">
                                         <div
                                             :class="[ isOverDue(todo.due_date) ? 'btn-danger inactive-btn-danger ' : 'btn-warning inactive-btn-warning' ]"
@@ -46,29 +47,38 @@
                         </div>
                         <div class="col-12 toolbar-row">
                             <button
-                                    @click="openViewToDoModal(todo)"
-                                    class="btn btn-sm btn-round btn-secondary"
-                                    title="View To Do"
+                                @click="openViewToDoModal(todo)"
+                                class="btn btn-sm btn-round btn-secondary"
+                                title="View To Do"
                             >
                                 <i class="zmdi zmdi-eye"></i>
                             </button>
                             <button
-                                    @click="openInputToDoModal(todo)"
-                                    class="btn btn-sm btn-round btn-secondary"
-                                    title="Edit To Do"
+                                v-if="!complete"
+                                @click="openInputToDoModal(todo)"
+                                class="btn btn-sm btn-round btn-secondary"
+                                title="Edit To Do"
                             >
                                 <i class="zmdi zmdi-edit"></i>
                             </button>
                             <button
-                                    @click="openDeleteToDoModal(todo)"
-                                    class="btn btn-sm btn-round btn-secondary"
-                                    title="Delete To Do"
+                                @click="openDeleteToDoModal(todo)"
+                                class="btn btn-sm btn-round btn-secondary"
+                                title="Delete To Do"
                             >
                                 <i class="zmdi zmdi-delete"></i>
                             </button>
+                            <button
+                                v-if="complete"
+                                @click="toggleToDoStatus(todo.id, false)"
+                                class="btn btn-sm btn-round btn-secondary"
+                                title="Add to In Progress"
+                            >
+                                <i class="zmdi zmdi-refresh"></i>
+                            </button>
                             <span v-if="hasAttachment(todo)" class="has-attachment">
                                     <i class="zmdi zmdi-attachment-alt"></i>
-                                </span>
+                            </span>
                         </div>
                     </article>
                 </div>
@@ -81,11 +91,32 @@
 import { EventBus } from "../eventbus/event-bus";
 import moment from '../../../node_modules/moment';
 
+const TOGGLE_TO_DO_ROUTE = '/api/toggle-to-do/';
+
 export default {
     props: {
+        complete: {
+            type: Boolean,
+            default: false,
+        },
         todos: {
             type: Array,
             default: null
+        },
+        userId: {
+            type: Number,
+        }
+    },
+    computed: {
+        emptyContainerText() {
+            return !this.$props.complete ?
+                '🎉 You\'re all caught up!' :
+                'You have no completed To Dos';
+        },
+        headerText() {
+            return !this.$props.complete ?
+                `In Progress (${this.$props.todos.length})` :
+                `Complete (${this.$props.todos.length})`;
         }
     },
     methods: {
@@ -103,6 +134,20 @@ export default {
         },
         openViewToDoModal(todo) {
             EventBus.$emit('modal-open-view-todo', todo);
+        },
+        toggleToDoStatus(todoId, isComplete) {
+            const data = {
+                complete: isComplete
+            };
+
+            axios.post(`${TOGGLE_TO_DO_ROUTE}${todoId}/${this.$props.userId}`, data)
+                .then(response => {
+                    EventBus.$emit('update-todos', response.data);
+                })
+                //todo create alert
+                .catch(errors => {
+                    alert("Something went wrong");
+                })
         }
     }
 }
@@ -134,6 +179,7 @@ export default {
     font-weight: bold;
 }
 header {
+    color: $white;
     font-size: 2rem;
     margin-bottom: 0.5rem;
 }

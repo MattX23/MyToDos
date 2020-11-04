@@ -83,6 +83,8 @@ export default {
                     this.closeModal();
                     EventBus.$emit('update-todos', response.data);
                 })
+                //todo create alert
+                .catch(() => alert('something went wrong'));
         },
     }
 }
