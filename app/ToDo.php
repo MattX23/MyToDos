@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string     $body
  * @property string     $due_date
  * @property string     $remind_at
- * @property bool       $complete
+ * @property bool       $is_complete
  * @property string     $image
  * @property Attachment $attachment
  * @property User       $user
@@ -41,7 +41,7 @@ class ToDo extends Model implements Arrayable
      */
     protected $fillable = [
         'body',
-        'complete',
+        'is_complete',
         'due_date',
         'image',
         'remind_at',
@@ -87,15 +87,15 @@ class ToDo extends Model implements Arrayable
     public function toArray(): array
     {
         return [
-            'attachment' => $this->attachment,
-            'body'       => $this->body,
-            'complete'   => $this->complete,
-            'due_date'   => $this->due_date,
-            'id'         => $this->id,
-            'image'      => $this->image,
-            'remind_at'  => $this->remind_at,
-            'title'      => $this->title,
-            'user_id'    => $this->user_id,
+            'attachment'  => $this->attachment,
+            'body'        => $this->body,
+            'is_complete' => $this->is_complete,
+            'due_date'    => $this->due_date,
+            'id'          => $this->id,
+            'image'       => $this->image,
+            'remind_at'   => $this->remind_at,
+            'title'       => $this->title,
+            'user_id'     => $this->user_id,
         ];
     }
 }
