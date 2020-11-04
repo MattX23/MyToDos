@@ -311,4 +311,30 @@ class ToDoTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function testMarkToDoAsComplete()
+    {
+        $toDo = ToDo::where('is_complete', '=', false)->first();
+
+        $this->post( '/api/toggle-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'complete' => true,
+        ]);
+
+        $toDo->refresh();
+
+        $this->assertEquals(true, $toDo->is_complete);
+    }
+
+    public function testMarkToDoAsIncomplete()
+    {
+        $toDo = ToDo::where('is_complete', '=', true)->first();
+
+        $this->post( '/api/toggle-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'complete' => false,
+        ]);
+
+        $toDo->refresh();
+
+        $this->assertEquals(false, $toDo->is_complete);
+    }
 }
