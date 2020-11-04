@@ -110,7 +110,7 @@ class ToDoController extends Controller
      */
     public function getToDos(User $user): array
     {
-        $toDos = $user->toDos->groupby('complete');
+        $toDos = $user->toDos->groupby('is_complete');
 
         return [
             'incomplete' => isset($toDos[0]) ? $toDos[0] : [],
