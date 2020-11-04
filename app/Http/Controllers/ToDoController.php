@@ -64,12 +64,15 @@ class ToDoController extends Controller
      */
     public function edit(ToDo $toDo, User $user, UpdateToDo $request): JsonResponse
     {
-        $image = $request->file('image');
-        $attachment = $request->file('attachment');
+        list($image, $attachment) = $this->removeFiles($toDo, $request);
 
-        $this->removeExistingUploads($toDo, (bool) $image, (bool) $attachment);
-
-        $imageName = $image ? $this->storeImage($image, $user) : $toDo->image;
+        $imageName = $image ?
+            $this->storeImage($image, $user) :
+            (
+                $request->get('deleteImage') ?
+                    null :
+                    $toDo->image
+            );
 
         $toDo->update([
             'title'     => $request->get('title'),
@@ -127,6 +130,26 @@ class ToDoController extends Controller
     }
 
     /**
+     * @param \App\ToDo                           $toDo
+     * @param \App\Http\Requests\ToDos\UpdateToDo $request
+     *
+     * @throws \Exception
+     * @return array
+     */
+    protected function removeFiles(ToDo $toDo, UpdateToDo $request): array
+    {
+        $image = $request->file('image');
+        $attachment = $request->file('attachment');
+
+        $shouldDeleteExistingImage = (bool)$image || $request->get('deleteImage');
+        $shouldDeleteExistingAttachment = (bool)$attachment || $request->get('deleteAttachment');
+
+        $this->removeExistingUploads($toDo, $shouldDeleteExistingImage, $shouldDeleteExistingAttachment);
+
+        return array($image, $attachment);
+    }
+
+    /**
      * @param \App\ToDo $toDo
      * @param bool      $image
      * @param bool      $attachment
@@ -178,6 +201,7 @@ class ToDoController extends Controller
             $image->getClientOriginalExtension(),
             $user->id
         );
+
         $storagePath = Storage::putFileAs(ToDo::IMAGE_FILE_PATH, $image, $storageName);
 
         return ToDo::IMAGE_DISPLAY_PATH.basename($storagePath);

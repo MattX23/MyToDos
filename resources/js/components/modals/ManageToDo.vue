@@ -90,12 +90,18 @@
                                         <span v-if="errors.remindAt" class="error">{{ errors.remindAt }}</span>
                                     </div>
                                 </div>
-                                <div v-if="isEditing && activeToDo.image" class="row margin-btm-sm">
+                                <div v-if="showImageField && activeToDo.image" class="row margin-btm-sm">
                                     <div class="col-3 label">
                                         <label for="image">Image:</label>
                                     </div>
-                                    <div v-if="activeToDo.image" class="col-9 margin-btm-sm">
+                                    <div v-if="activeToDo.image" class="col-7 margin-btm-sm">
                                         <img :src="activeToDo.image" class="todo-image round-image modal-header-image" alt="image">
+                                    </div>
+                                    <div class="col-2">
+                                        <span
+                                            @click="removeImage()"
+                                            class="remove-btn"
+                                        >X</span>
                                     </div>
                                 </div>
                                 <div class="row margin-btm-sm">
@@ -113,14 +119,20 @@
                                         <span v-if="errors.image" class="error">{{ errors.image }}</span>
                                     </div>
                                 </div>
-                                <div v-if="isEditing && activeToDo.attachment" class="row margin-btm-sm">
+                                <div v-if="showAttachmentField && activeToDo.attachment" class="row margin-btm-sm">
                                     <div class="col-3 label">
                                         <label for="attachment">Attachment:</label>
                                     </div>
-                                    <div class="col-9">
+                                    <div class="col-7">
                                         <p id="attachment">
                                             <a :href="activeToDo.attachment.file_path" target="_blank" title="Download">{{ activeToDo.attachment.display_name }}</a>
                                         </p>
+                                    </div>
+                                    <div class="col-2">
+                                        <span
+                                            @click="removeAttachment()"
+                                            class="remove-btn"
+                                        >X</span>
                                     </div>
                                 </div>
                                 <div class="row margin-btm-sm">
@@ -200,9 +212,13 @@ export default {
                 title: '',
             },
             reminderDays: {},
+            showAttachmentField: false,
+            showImageField: false,
             todo: {
                 attachment: null,
                 body: '',
+                deleteAttachment: false,
+                deleteImage: false,
                 dueDate: null,
                 id: null,
                 image: null,
@@ -236,6 +252,8 @@ export default {
     watch: {
         activeToDo: function(val) {
             if (val) {
+                this.showAttachmentField = true;
+                this.showImageField = true;
                 this.isEditing = true;
                 if (this.$props.activeToDo.remind_at) {
                     this.todo.remindAt = moment(this.$props.activeToDo.due_date).diff(moment(this.$props.activeToDo.remind_at), 'days');
@@ -247,6 +265,10 @@ export default {
                 this.todo.id = this.$props.activeToDo.id;
                 this.todo.title = this.$props.activeToDo.title;
             } else {
+                this.showAttachmentField = false;
+                this.showImageField = false;
+                this.showAttachmentField = false;
+                this.showImageField = false;
                 this.isEditing = false;
             }
         },
@@ -284,6 +306,14 @@ export default {
         reminderIsInTheFuture() {
             return moment().add(1, 'days').format('YYYY-MM-DD') <=
                 moment(this.todo.dueDate).subtract(this.todo.remindAt, 'days').format('YYYY-MM-DD');
+        },
+        removeAttachment() {
+            this.todo.deleteAttachment = true;
+            this.showAttachmentField = false;
+        },
+        removeImage() {
+            this.todo.deleteImage = true;
+            this.showImageField = false;
         },
         selectFile(type) {
             if (type === 'image') {
@@ -354,8 +384,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../sass/variables';
+
 .label {
     font-weight: bold;
     padding-top: 7px;
+}
+.remove-btn {
+    background: $grey;
+    color: $white;
+    padding: 4px 8px;
+    border-radius: 10px;
+    float: right;
+    cursor: pointer;
+    position: relative;
+    top: 5px;
+    font-size: 0.65rem;
+}
+.remove-btn:hover {
+    background: $red;
 }
 </style>

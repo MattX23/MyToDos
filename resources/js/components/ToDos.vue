@@ -99,7 +99,7 @@ export default {
             EventBus.$emit('modal-open-delete-todo', todo);
         },
         openInputToDoModal(todo = null) {
-            EventBus.$emit('modal-open-add-todo', todo);
+            EventBus.$emit('modal-open-manage-todo', todo);
         },
         openViewToDoModal(todo) {
             EventBus.$emit('modal-open-view-todo', todo);

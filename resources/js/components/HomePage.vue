@@ -5,11 +5,11 @@
                 :todos="incomplete"
             ></to-dos>
         </div>
-        <modal-add-todo
+        <modal-manage-todo
             :active-to-do="activeTodo"
             :is-active="isAddTodoModalActive"
             :user-id="userId"
-        ></modal-add-todo>
+        ></modal-manage-todo>
         <modal-view-todo
             :user-id="userId"
             :is-active="isViewTodoModalActive"
@@ -40,7 +40,8 @@ export default {
             this.activeTodoView = null;
             this.isBlurred = false;
         });
-        EventBus.$on('modal-open-add-todo', (todo) => {
+        EventBus.$on('modal-open-manage-todo', (todo) => {
+            this.clearFileUploads();
             this.isAddTodoModalActive = true;
             this.activeTodo = todo;
             this.isBlurred = true;
@@ -77,6 +78,10 @@ export default {
         }
     },
     methods: {
+        clearFileUploads() {
+            document.getElementById('file').value = "";
+            document.getElementById('image').value = "";
+        },
         getToDos() {
             axios.get(GET_TO_DOS_ROUTE+this.$props.userId)
                 .then(response => {
