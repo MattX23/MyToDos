@@ -49,6 +49,10 @@ class ToDo extends Model implements Arrayable
         'user_id',
     ];
 
+    protected $casts = [
+        'is_complete' => 'bool',
+    ];
+
     /**
      * @var array
      */
