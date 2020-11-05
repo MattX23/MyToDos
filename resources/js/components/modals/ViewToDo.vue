@@ -43,7 +43,7 @@
                                 <hr>
                             </div>
                         </div>
-                        <div v-show="todo.attachment" class="row">
+                        <div v-if="todo.attachment" class="row">
                             <div class="col-12">
                                 <div class="row margin-btm-sm">
                                     <div class="col-3 label">
