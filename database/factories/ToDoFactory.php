@@ -12,7 +12,9 @@ $factory->define(ToDo::class, function (Faker $faker) {
     $date = $faker->dateTimeBetween('now', '+5 months');
 
     $dueDate = rand(0, 10) <= 5 ? Carbon::parse($date)->format('Y-m-d') : null;
-    $remindAt = $dueDate ? Carbon::parse($date)->subDays(array_rand($days))->format('Y-m-d') : null;
+    $remindAt = $dueDate ?
+        Carbon::parse($date)->subDays(array_rand($days))->format('Y-m-d 08:00:00') :
+        null;
 
     return [
         'title'       => $faker->sentence(rand(2, 6)),
