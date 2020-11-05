@@ -64,7 +64,7 @@
                                     </div>
                                     <div class="col-9">
                                         <input
-                                            @focus="clearError('dueDate')  "
+                                            @focus="clearError('dueDate')"
                                             v-model="todo.dueDate"
                                             class="form-control"
                                             id="due_date"
@@ -78,16 +78,27 @@
                                         <label for="remind_at">Remind me:</label>
                                     </div>
                                     <div class="col-9">
-                                        <select
-                                            @change="clearError('remindAt')"
+                                        <input
+                                            @focus="clearError('remindAt')"
                                             v-model="todo.remindAt"
                                             class="form-control"
                                             id="remind_at"
+                                            type="date"
                                         >
-                                            <option value="" selected>Never</option>
-                                            <option v-for="(reminderDay, value) in reminderDays" :value="value" :key="value">{{ reminderDay }}</option>
-                                        </select>
                                         <span v-if="errors.remindAt" class="error">{{ errors.remindAt }}</span>
+                                    </div>
+                                </div>
+                                <div v-if="todo.remindAt" class="row margin-btm-sm">
+                                    <div class="col-3 label">
+                                        <label>At:</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <select
+                                            v-model="todo.remindAtTime"
+                                            class="form-control"
+                                        >
+                                            <option v-for="(_, hour) in 24" :value="hour" :key="hour">{{ hour }}:00 {{ getTimeOfDay(hour) }}</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div v-if="showImageField && activeToDo.image" class="row margin-btm-sm">
@@ -179,7 +190,7 @@ import moment from '../../../../node_modules/moment';
 
 const STORE_TO_DO_ROUTE = '/api/store-to-do/';
 const EDIT_TO_DO_ROUTE = '/api/edit-to-do/';
-const GET_REMINDER_DAYS_ROUTE = '/api/get-reminder-days';
+const REMIND_AT_DEFAULT_TIME = 8;
 
 export default {
     props: {
@@ -195,11 +206,6 @@ export default {
             type: Number,
         }
     },
-    mounted() {
-        this.$nextTick(function () {
-            this.getReminderDaysOptions();
-        });
-    },
     data() {
         return {
             isEditing: false,
@@ -209,6 +215,7 @@ export default {
                 dueDate: '',
                 image: '',
                 remindAt: '',
+                remindAtTime: '',
                 title: '',
             },
             reminderDays: {},
@@ -223,6 +230,7 @@ export default {
                 id: null,
                 image: null,
                 remindAt: "",
+                remindAtTime: REMIND_AT_DEFAULT_TIME,
                 title: '',
             },
         }
@@ -242,8 +250,8 @@ export default {
         },
         shouldShowReminder() {
             const today = moment().format('YYYY-MM-DD');
-            return this.todo.dueDate &&
-                this.todo.dueDate > today;
+            return (this.todo.dueDate && this.todo.dueDate > today) ||
+                (this.activeToDo && this.activeToDo.remind_at);
         },
         submitButtonText() {
             return this.isEditing ? "Edit" : "Create";
@@ -255,9 +263,8 @@ export default {
                 this.showAttachmentField = true;
                 this.showImageField = true;
                 this.isEditing = true;
-                if (this.$props.activeToDo.remind_at) {
-                    this.todo.remindAt = moment(this.$props.activeToDo.due_date).diff(moment(this.$props.activeToDo.remind_at), 'days');
-                }
+                this.todo.remindAt = this.$props.activeToDo.remind_at;
+                this.todo.remindAtTime = this.todo.remindAt ? this.$props.activeToDo.remind_at_time : REMIND_AT_DEFAULT_TIME;
                 this.todo.body = this.$props.activeToDo.body;
                 this.todo.dueDate = this.$props.activeToDo.due_date;
                 this.todo.existingAttachment = this.$props.activeToDo.attachment ? this.$props.activeToDo.attachment.display_name : {};
@@ -265,6 +272,7 @@ export default {
                 this.todo.id = this.$props.activeToDo.id;
                 this.todo.title = this.$props.activeToDo.title;
             } else {
+                this.todo.remindAtTime = REMIND_AT_DEFAULT_TIME;
                 this.showAttachmentField = false;
                 this.showImageField = false;
                 this.showAttachmentField = false;
@@ -297,17 +305,12 @@ export default {
             this.clearAllErrors();
             EventBus.$emit('close-modal');
         },
-        getReminderDaysOptions() {
-            axios.get(GET_REMINDER_DAYS_ROUTE)
-                .then(response => {
-                    this.reminderDays = response.data;
-                })
-                //todo create alert
-                .catch(() => alert('something went wrong'));
+        getTimeOfDay(hour) {
+            return hour < 12 ? 'AM' : 'PM';
         },
         reminderIsInTheFuture() {
             return moment().add(1, 'days').format('YYYY-MM-DD') <=
-                moment(this.todo.dueDate).subtract(this.todo.remindAt, 'days').format('YYYY-MM-DD');
+                moment(this.todo.remindAt).format('YYYY-MM-DD');
         },
         removeAttachment() {
             this.todo.deleteAttachment = true;

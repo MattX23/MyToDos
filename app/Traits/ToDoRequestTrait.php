@@ -3,21 +3,20 @@
 namespace App\Traits;
 
 use App\ToDo;
-use Carbon\Carbon;
 
 /**
  * @property string $dueDate
  * @property string $remindAt
+ * @property string $remindAtTime
  */
 trait ToDoRequestTrait
 {
     protected function prepareForValidation(): void
     {
-        if ($this->dueDate && $this->remindAt) {
+        if ($this->remindAtTime) {
+            $time = $this->remindAtTime < 10 ? "0$this->remindAtTime" : $this->remindAtTime;
             $this->merge([
-                'remindAt' => Carbon::parse($this->dueDate)
-                    ->subDays($this->remindAt)
-                    ->format('Y-m-d'),
+                'remindAtTime' => "$time:00",
             ]);
         }
     }

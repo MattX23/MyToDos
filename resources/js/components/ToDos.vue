@@ -34,7 +34,7 @@
                                         <div
                                             class="btn btn-pill btn-info inactive-btn-info drop-shadow float-left"
                                             title="Reminder set"
-                                        ><i class="zmdi zmdi-time"></i> {{ todo.remind_at }}</div>
+                                        ><i class="zmdi zmdi-time"></i> {{ todo.remind_at.substr(0, 10) }}</div>
                                     </div>
                                 </div>
                             </div>

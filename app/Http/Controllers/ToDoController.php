@@ -7,21 +7,23 @@ use App\Http\Requests\ToDos\DeleteToDo;
 use App\Http\Requests\ToDos\StoreToDo;
 use App\Http\Requests\ToDos\ToggleToDo;
 use App\Http\Requests\ToDos\UpdateToDo;
+use App\Http\Requests\ToDos\ViewToDo;
 use App\ToDo;
+use App\ToDoRequest;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 
 class ToDoController extends Controller
 {
     /**
-     * @param \App\User $user
+     * @param \App\User                         $user
+     * @param \App\Http\Requests\ToDos\ViewToDo $request
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function get(User $user): JsonResponse
+    public function get(User $user, ViewToDo $request): JsonResponse
     {
         return $this->apiResponse($this->getToDos($user));
     }
@@ -39,12 +41,14 @@ class ToDoController extends Controller
 
         $imageName = $image ? $this->storeImage($image, $user) : null;
 
+        $remindAt = $this->getRemindAtDateTime($request);
+
         $toDo = ToDo::create([
             'user_id'   => $user->id,
             'title'     => $request->get('title'),
             'body'      => $request->get('body'),
             'due_date'  => $request->get('dueDate'),
-            'remind_at' => $request->get('remindAt'),
+            'remind_at' => $remindAt,
             'image'     => $imageName,
         ]);
 
@@ -75,11 +79,13 @@ class ToDoController extends Controller
                     $toDo->image
             );
 
+        $remindAt = $this->getRemindAtDateTime($request);
+
         $toDo->update([
             'title'     => $request->get('title'),
             'body'      => $request->get('body'),
             'due_date'  => $request->get('dueDate'),
-            'remind_at' => $request->get('remindAt'),
+            'remind_at' => $remindAt,
             'image'     => $imageName,
         ]);
 
@@ -134,14 +140,6 @@ class ToDoController extends Controller
         ]);
 
         return $this->apiResponse($this->getToDos($user));
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getReminderDays(): JsonResponse
-    {
-        return $this->apiResponse(Config::get('options.reminders'));
     }
 
     /**
@@ -253,5 +251,28 @@ class ToDoController extends Controller
     protected function getUploadName(string $filename, string $extension, int $userId): string
     {
         return md5($filename.$userId).'.'.$extension;
+    }
+
+    /**
+     * @param string $date
+     * @param string $time
+     *
+     * @return string
+     */
+    protected function createRemindAtTimeStamp(string $date, string $time): string
+    {
+        return "$date $time:00";
+    }
+
+    /**
+     * @param \App\ToDoRequest $request
+     *
+     * @return string|null
+     */
+    protected function getRemindAtDateTime(ToDoRequest $request)
+    {
+        return $request->get('remindAt') ?
+            $this->createRemindAtTimeStamp($request->get('remindAt'), $request->get('remindAtTime')) :
+            null;
     }
 }

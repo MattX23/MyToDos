@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string     $body
  * @property string     $due_date
  * @property string     $remind_at
+ * @property string     $remind_at_time
  * @property bool       $is_complete
  * @property string     $image
  * @property Attachment $attachment
@@ -26,18 +27,19 @@ class ToDo extends Model implements Arrayable
     const IMAGE_FILE_PATH = '/public/images';
     const IMAGE_DISPLAY_PATH = '/images/';
     const RULES = [
-        'attachment' => 'nullable|file|max:4096',
-        'body'       => 'nullable|string',
-        'dueDate'    => 'nullable|date|required_with:remindAt|after:today',
-        'image'      => 'nullable|image|max:4096',
-        'remindAt'   => 'nullable|exclude_if:dueDate,null|date|after:tomorrow',
-        'title'      => 'required|string|min:2',
+        'attachment'   => 'nullable|file|max:4096',
+        'body'         => 'nullable|string',
+        'dueDate'      => 'nullable|date|required_with:remindAt|after:today',
+        'image'        => 'nullable|image|max:4096',
+        'remindAt'     => 'nullable|exclude_if:dueDate,null|date|after:tomorrow',
+        'remindAtTime' => 'required_with:remindAt|date_format:H:i',
+        'title'        => 'required|string|min:2',
     ];
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var string[]
      */
     protected $fillable = [
         'body',
@@ -49,15 +51,25 @@ class ToDo extends Model implements Arrayable
         'user_id',
     ];
 
+    /**
+     * @var string[]
+     */
     protected $casts = [
         'is_complete' => 'bool',
     ];
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $with = [
-        'attachment'
+        'attachment',
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $appends = [
+        'remind_at_time',
     ];
 
     /**
@@ -86,20 +98,31 @@ class ToDo extends Model implements Arrayable
     }
 
     /**
+     * @return string
+     */
+    public function getRemindAtTimeAttribute(): string
+    {
+        $time = substr($this->remind_at, 11, 2);
+
+        return $time && $time[0] === "0" ? $time[1] : $time;
+    }
+
+    /**
      * @return array
      */
     public function toArray(): array
     {
         return [
-            'attachment'  => $this->attachment,
-            'body'        => $this->body,
-            'is_complete' => $this->is_complete,
-            'due_date'    => $this->due_date,
-            'id'          => $this->id,
-            'image'       => $this->image,
-            'remind_at'   => $this->remind_at,
-            'title'       => $this->title,
-            'user_id'     => $this->user_id,
+            'attachment'     => $this->attachment,
+            'body'           => $this->body,
+            'is_complete'    => $this->is_complete,
+            'due_date'       => $this->due_date,
+            'id'             => $this->id,
+            'image'          => $this->image,
+            'remind_at'      => substr($this->remind_at, 0, 10),
+            'remind_at_time' => $this->remind_at_time,
+            'title'          => $this->title,
+            'user_id'        => $this->user_id,
         ];
     }
 }
