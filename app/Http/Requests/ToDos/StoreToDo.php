@@ -3,10 +3,10 @@
 namespace App\Http\Requests\ToDos;
 
 use App\ToDo;
+use App\ToDoRequest;
 use App\Traits\ToDoRequestTrait;
-use Illuminate\Foundation\Http\FormRequest;
 
-class StoreToDo extends FormRequest
+class StoreToDo extends ToDoRequest
 {
     use ToDoRequestTrait;
 

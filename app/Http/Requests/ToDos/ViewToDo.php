@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests\ToDos;
 
-use App\ToDo;
-use App\ToDoRequest;
 use App\Traits\ToDoRequestTrait;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class UpdateToDo extends ToDoRequest
+class ViewToDo extends FormRequest
 {
     use ToDoRequestTrait;
 
@@ -15,9 +15,9 @@ class UpdateToDo extends ToDoRequest
      *
      * @return bool
      */
-    public function authorize(): bool
+    public function authorize()
     {
-        return $this->userIsAuthorised();
+        return $this->route('user')->id === Auth::user()->id;
     }
 
     /**
@@ -27,6 +27,6 @@ class UpdateToDo extends ToDoRequest
      */
     public function rules()
     {
-        return ToDo::RULES;
+        return [];
     }
 }
