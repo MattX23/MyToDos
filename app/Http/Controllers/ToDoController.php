@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Attachment;
 use App\Http\Requests\ToDos\DeleteToDo;
 use App\Http\Requests\ToDos\StoreToDo;
+use App\Http\Requests\ToDos\ToDoRequest;
 use App\Http\Requests\ToDos\ToggleToDo;
 use App\Http\Requests\ToDos\UpdateToDo;
 use App\Http\Requests\ToDos\ViewToDo;
 use App\ToDo;
-use App\ToDoRequest;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
@@ -265,7 +265,7 @@ class ToDoController extends Controller
     }
 
     /**
-     * @param \App\ToDoRequest $request
+     * @param \App\Http\Requests\ToDos\ToDoRequest $request
      *
      * @return string|null
      */

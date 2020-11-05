@@ -3,7 +3,6 @@
 namespace App\Http\Requests\ToDos;
 
 use App\ToDo;
-use App\ToDoRequest;
 use App\Traits\ToDoRequestTrait;
 
 class StoreToDo extends ToDoRequest
