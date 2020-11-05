@@ -12,16 +12,16 @@ $factory->define(ToDo::class, function (Faker $faker) {
     $date = $faker->dateTimeBetween('now', '+5 months');
 
     $dueDate = rand(0, 10) <= 5 ? Carbon::parse($date)->format('Y-m-d') : null;
-    $remindAt = $dueDate ? Carbon::parse($date)->subDays(array_rand($days))->format('Y-m-d') : null;
-
-    // todo add attachment
+    $remindAt = $dueDate ?
+        Carbon::parse($date)->subDays(array_rand($days))->format('Y-m-d 08:00:00') :
+        null;
 
     return [
-        'title'      => $faker->sentence(rand(2, 6)),
-        'body'       => rand(0, 10) <= 5 ? null : $faker->sentence(rand(5, 15)),
-        'due_date'   => $dueDate,
-        'remind_at'  => rand(0, 10) <= 5 && $dueDate ? $remindAt : null,
-        'complete'   => rand(0, 10) <= 5 ? true : false,
-        'image'      => null,
+        'title'       => $faker->sentence(rand(2, 6)),
+        'body'        => rand(0, 10) <= 5 ? null : $faker->sentence(rand(5, 15)),
+        'due_date'    => $dueDate,
+        'remind_at'   => rand(0, 10) <= 5 && $dueDate ? $remindAt : null,
+        'is_complete' => rand(0, 10) <= 5 ? true : false,
+        'image'       => rand(0, 10) <= 5 ? '/images/seed_files/img'.rand(1, 4).'.jpg' : null,
     ];
 });
