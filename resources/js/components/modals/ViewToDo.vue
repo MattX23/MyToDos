@@ -61,14 +61,14 @@
                         <div class="row">
                             <div v-if="!todo.is_complete" class="col-12">
                                 <div class="row">
-                                    <div class="col-5">
+                                    <div class="col-sm-5">
                                         <div class="row margin-btm-sm">
                                             <div class="col-5 label">
                                                 <label for="due_date"><i class="zmdi zmdi-calendar"></i> Due:</label>
                                             </div>
                                             <div class="col-7">
                                                 <p v-if="todo.due_date" id="due_date">
-                                                    {{ todo.due_date }}
+                                                    {{ getDateInDayMonthFormat(todo.due_date) }}
                                                 </p>
                                                 <p v-else>
                                                     Not set.
@@ -76,14 +76,14 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-7">
+                                    <div class="col-sm-7">
                                         <div class="row margin-btm-sm">
                                             <div class="col-5 label">
                                                 <label for="remind_at"><i class="zmdi zmdi-time"></i> Reminder:</label>
                                             </div>
                                             <div class="col-6">
                                                 <p v-if="todo.remind_at" id="remind_at">
-                                                    {{ todo.remind_at }}
+                                                    {{ getDateInDayMonthFormat(todo.remind_at) }} ({{ todo.remind_at_time }}:00)
                                                 </p>
                                                 <p v-else>
                                                     Not set.
@@ -104,6 +104,7 @@
 
 <script>
 import { EventBus } from "../../eventbus/event-bus";
+import { getDateInDayMonthFormat } from '../../helpers/dates';
 
 export default {
     props: {
@@ -119,6 +120,7 @@ export default {
         },
     },
     methods: {
+        getDateInDayMonthFormat,
         closeModal() {
             EventBus.$emit('close-modal');
         },
