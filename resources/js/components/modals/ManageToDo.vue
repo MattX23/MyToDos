@@ -308,6 +308,10 @@ export default {
         getTimeOfDay(hour) {
             return hour < 12 ? 'AM' : 'PM';
         },
+        reminderIsBeforeDueDate() {
+            return moment(this.todo.dueDate).format('YYYY-MM-DD') >
+                moment(this.todo.remindAt).format('YYYY-MM-DD');
+        },
         reminderIsInTheFuture() {
             return moment().add(1, 'days').format('YYYY-MM-DD') <=
                 moment(this.todo.remindAt).format('YYYY-MM-DD');
@@ -376,8 +380,13 @@ export default {
             }
 
             if (this.todo.remindAt) {
-                  if (! this.reminderIsInTheFuture()) {
+                if (! this.reminderIsInTheFuture()) {
                     this.errors.remindAt = 'Reminders cannot be set in the past';
+                    isValid = false;
+                }
+
+                if (! this.reminderIsBeforeDueDate()) {
+                    this.errors.remindAt = 'The Reminder date must be before the Due Date';
                     isValid = false;
                 }
             }

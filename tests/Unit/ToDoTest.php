@@ -172,6 +172,20 @@ class ToDoTest extends TestCase
             ->assertStatus(302);
     }
 
+    public function testStoreWithRemindAtAfterDueDate()
+    {
+        $response = $this->post( '/api/store-to-do/'.$this->user->id, [
+            'title'        => 'To Do with Reminder after Due Date',
+            'dueDate'      => Carbon::now()->format('Y-m-d'),
+            'remindAt'     => Carbon::now()->subDays(1)->format('Y-m-d'),
+            'remindAtTime' => 8,
+        ]);
+
+        $response
+            ->assertSessionHasErrors('remindAt')
+            ->assertStatus(302);
+    }
+
     public function testStoreWithReminderBeforeDueDate()
     {
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [

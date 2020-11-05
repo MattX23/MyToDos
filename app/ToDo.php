@@ -31,7 +31,7 @@ class ToDo extends Model implements Arrayable
         'body'         => 'nullable|string',
         'dueDate'      => 'nullable|date|required_with:remindAt|after:today',
         'image'        => 'nullable|image|max:4096',
-        'remindAt'     => 'nullable|exclude_if:dueDate,null|date|after:tomorrow',
+        'remindAt'     => 'nullable|exclude_if:dueDate,null|date|after:tomorrow|before:dueDate',
         'remindAtTime' => 'required_with:remindAt|date_format:H:i',
         'title'        => 'required|string|min:2',
     ];
