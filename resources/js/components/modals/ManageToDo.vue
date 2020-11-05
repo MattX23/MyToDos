@@ -354,6 +354,8 @@ export default {
                     .then(response => {
                         this.closeModal();
                         EventBus.$emit('update-todos', response.data);
+                        const message = !this.todo.isEditing ? '💾 To Do saved!' : '✏️ To Do updated!';
+                        EventBus.$emit('show-flash-message', message, 'success');
                     })
                     .catch(errors => {
                         const errorObj = errors.response.data.errors;

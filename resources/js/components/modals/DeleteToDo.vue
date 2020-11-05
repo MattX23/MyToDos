@@ -82,9 +82,9 @@ export default {
                 .then(response => {
                     this.closeModal();
                     EventBus.$emit('update-todos', response.data);
+                    EventBus.$emit('show-flash-message', '🗑 To Do deleted!', 'success')
                 })
-                //todo create alert
-                .catch(() => alert('something went wrong'));
+                .catch(() => EventBus.$emit('show-flash-message', '⚠️ Something went wrong', 'danger'));
         },
     }
 }
