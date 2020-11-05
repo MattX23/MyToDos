@@ -118,7 +118,6 @@ export default {
                 .then(response => {
                     this.complete = response.data.complete;
                     this.incomplete = response.data.incomplete;
-                    EventBus.$emit('show-flash-message', '⚠️ Something went wrong', 'danger')
                 })
                 .catch(() => EventBus.$emit('show-flash-message', '⚠️ Something went wrong', 'danger'));
         }
