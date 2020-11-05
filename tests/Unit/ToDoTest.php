@@ -57,6 +57,18 @@ class ToDoTest extends TestCase
         $this->assertMatchesJsonSnapshot($response->getContent());
     }
 
+    public function testStoreToDoWithReminderAndDueDate()
+    {
+        $response = $this->post( '/api/store-to-do/'.$this->user->id, [
+            'title'        => 'Fresh To Do',
+            'dueDate'      => '2021-01-01',
+            'remindAt'     => '2020-12-25',
+            'remindAtTime' => '8',
+        ]);
+
+        $this->assertMatchesJsonSnapshot($response->getContent());
+    }
+
     public function testStoreToDoWithMissingData()
     {
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
@@ -148,13 +160,6 @@ class ToDoTest extends TestCase
             ->assertStatus(302);
     }
 
-    public function testGetReminderDays()
-    {
-        $response = $this->get( '/api/get-reminder-days');
-
-        $this->assertMatchesJsonSnapshot($response->getContent());
-    }
-
     public function testStoreWithDueDateInPast()
     {
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
@@ -210,7 +215,7 @@ class ToDoTest extends TestCase
             'body'     => 'A new To Do body',
         ]);
 
-        $response->assertStatus(403);
+        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
     }
 
     public function testImageIsRemovedWhenNewImageUploaded()
@@ -309,7 +314,16 @@ class ToDoTest extends TestCase
 
         $response = $this->delete( '/api/delete-to-do/'.$toDo->id.'/'.$this->user->id);
 
-        $response->assertStatus(403);
+        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
+    }
+
+    public function testUserCannotAccessAnotherUsersToDo()
+    {
+        $newUser = $this->getNewTestUser();
+
+        $response = $this->get( '/api/get-to-dos/'.$newUser->id);
+
+        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
     }
 
     public function testMarkToDoAsComplete()
