@@ -28,7 +28,7 @@
                                 <hr>
                             </div>
                         </div>
-                        <div v-if="todo.body" class="row">
+                        <div v-show="todo.body" class="row">
                             <div class="col-12">
                                 <div class="row margin-btm-sm">
                                     <div class="col-3 label">
@@ -43,7 +43,7 @@
                                 <hr>
                             </div>
                         </div>
-                        <div v-if="todo.attachment" class="row">
+                        <div v-show="todo.attachment" class="row">
                             <div class="col-12">
                                 <div class="row margin-btm-sm">
                                     <div class="col-3 label">
@@ -59,7 +59,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div v-if="!todo.is_complete" class="col-12">
+                            <div v-show="!todo.is_complete" class="col-12">
                                 <div class="row">
                                     <div class="col-sm-5">
                                         <div class="row margin-btm-sm">
