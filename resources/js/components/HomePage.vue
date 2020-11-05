@@ -1,20 +1,33 @@
 <template>
     <div>
         <div :class="{'blurred' : isBlurred}" class="container">
-            <to-dos
-                :todos="incomplete"
-            ></to-dos>
+            <div class="row">
+                <to-dos
+                    :todos="incomplete"
+                    :user-id="userId"
+                ></to-dos>
+                <to-dos
+                    :todos="complete"
+                    :complete="true"
+                    :user-id="userId"
+                ></to-dos>
+            </div>
         </div>
-        <modal-add-todo
+        <modal-manage-todo
             :active-to-do="activeTodo"
             :is-active="isAddTodoModalActive"
             :user-id="userId"
-        ></modal-add-todo>
+        ></modal-manage-todo>
         <modal-view-todo
             :user-id="userId"
             :is-active="isViewTodoModalActive"
             :todo="activeTodoView"
         ></modal-view-todo>
+        <modal-delete-todo
+            :user-id="userId"
+            :is-active="isDeleteTodoModalActive"
+            :todo="activeTodoDelete"
+        ></modal-delete-todo>
     </div>
 </template>
 
@@ -28,16 +41,24 @@ export default {
     created() {
         EventBus.$on('close-modal', () => {
             this.isAddTodoModalActive = false;
+            this.isDeleteTodoModalActive = false;
             this.isViewTodoModalActive = false;
             this.activeTodo = null;
+            this.activeTodoDelete = null;
             this.activeTodoView = null;
             this.isBlurred = false;
         });
-        EventBus.$on('modal-open-add-todo', (todo) => {
+        EventBus.$on('modal-open-manage-todo', (todo) => {
+            this.clearFileUploads();
             this.isAddTodoModalActive = true;
             this.activeTodo = todo;
             this.isBlurred = true;
        });
+        EventBus.$on('modal-open-delete-todo', (todo) => {
+            this.isDeleteTodoModalActive = true;
+            this.activeTodoDelete = todo;
+            this.isBlurred = true;
+        });
         EventBus.$on('modal-open-view-todo', (todo) => {
             this.isViewTodoModalActive = true;
             this.activeTodoView = todo;
@@ -54,21 +75,29 @@ export default {
     data() {
         return {
             activeTodo: null,
+            activeTodoDelete: null,
             activeTodoView: null,
             complete: [],
             incomplete: [],
             isAddTodoModalActive: false,
+            isDeleteTodoModalActive: false,
             isBlurred: false,
             isViewTodoModalActive: false,
         }
     },
     methods: {
+        clearFileUploads() {
+            document.getElementById('file').value = "";
+            document.getElementById('image').value = "";
+        },
         getToDos() {
             axios.get(GET_TO_DOS_ROUTE+this.$props.userId)
                 .then(response => {
                     this.complete = response.data.complete;
                     this.incomplete = response.data.incomplete;
                 })
+                //todo create alert
+                .catch(() => alert('something went wrong'));
         }
     }
 }

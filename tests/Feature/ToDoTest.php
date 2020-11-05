@@ -1,9 +1,8 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
 use App\ToDo;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
@@ -53,6 +52,18 @@ class ToDoTest extends TestCase
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
             'title' => 'Fresh To Do',
             'body'  => 'This is a fresh To Do',
+        ]);
+
+        $this->assertMatchesJsonSnapshot($response->getContent());
+    }
+
+    public function testStoreToDoWithReminderAndDueDate()
+    {
+        $response = $this->post( '/api/store-to-do/'.$this->user->id, [
+            'title'        => 'Fresh To Do',
+            'dueDate'      => '2021-01-01',
+            'remindAt'     => '2020-12-25',
+            'remindAtTime' => '8',
         ]);
 
         $this->assertMatchesJsonSnapshot($response->getContent());
@@ -149,13 +160,6 @@ class ToDoTest extends TestCase
             ->assertStatus(302);
     }
 
-    public function testGetReminderDays()
-    {
-        $response = $this->get( '/api/get-reminder-days');
-
-        $this->assertMatchesJsonSnapshot($response->getContent());
-    }
-
     public function testStoreWithDueDateInPast()
     {
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
@@ -165,6 +169,20 @@ class ToDoTest extends TestCase
 
         $response
             ->assertSessionHasErrors('dueDate')
+            ->assertStatus(302);
+    }
+
+    public function testStoreWithRemindAtAfterDueDate()
+    {
+        $response = $this->post( '/api/store-to-do/'.$this->user->id, [
+            'title'        => 'To Do with Reminder after Due Date',
+            'dueDate'      => Carbon::now()->format('Y-m-d'),
+            'remindAt'     => Carbon::now()->subDays(1)->format('Y-m-d'),
+            'remindAtTime' => 8,
+        ]);
+
+        $response
+            ->assertSessionHasErrors('remindAt')
             ->assertStatus(302);
     }
 
@@ -199,9 +217,7 @@ class ToDoTest extends TestCase
 
     public function testUserCannotEditAnotherUsersToDo()
     {
-        $newUser = factory(User::class, 1)
-            ->create()
-            ->first();
+        $newUser = $this->getNewTestUser();
 
         $toDo = ToDo::create([
             'user_id' => $newUser->id,
@@ -213,7 +229,7 @@ class ToDoTest extends TestCase
             'body'     => 'A new To Do body',
         ]);
 
-        $response->assertStatus(403);
+        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
     }
 
     public function testImageIsRemovedWhenNewImageUploaded()
@@ -235,6 +251,25 @@ class ToDoTest extends TestCase
         Storage::disk('local')->assertMissing('public/images/'.md5('image.png'.$this->user->id).'.png');
     }
 
+    public function testImageIsRemovedWhenWhenUserDeletesImage()
+    {
+        Storage::fake('local');
+
+        $this->json('POST', '/api/store-to-do/'.$this->user->id, [
+            'title' => 'Test Image Removal To Do',
+            'image' => UploadedFile::fake()->create('image.jpg')
+        ]);
+
+        $toDo = ToDo::where('title', '=', 'Test Image Removal To Do')->first();
+
+        $this->json('PUT', '/api/edit-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'title'       => 'Test To Do',
+            'deleteImage' => true
+        ]);
+
+        Storage::disk('local')->assertMissing('public/attachments/'.md5('image.jpg'.$this->user->id).'.jpg');
+    }
+
     public function testAttachmentIsRemovedWhenNewAttachmentUploaded()
     {
         Storage::fake('local');
@@ -252,5 +287,82 @@ class ToDoTest extends TestCase
         ]);
 
         Storage::disk('local')->assertMissing('public/attachments/'.md5('file.pdf'.$this->user->id).'.pdf');
+    }
+
+    public function testAttachmentIsRemovedWhenWhenUserDeletesAttachment()
+    {
+        Storage::fake('local');
+
+        $this->json('POST', '/api/store-to-do/'.$this->user->id, [
+            'title'      => 'Test Attachment Removal To Do',
+            'attachment' => UploadedFile::fake()->create('file.pdf')
+        ]);
+
+        $toDo = ToDo::where('title', '=', 'Test Attachment Removal To Do')->first();
+
+        $this->json('PUT', '/api/edit-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'title'            => 'Test To Do',
+            'deleteAttachment' => true
+        ]);
+
+        Storage::disk('local')->assertMissing('public/attachments/'.md5('file.pdf'.$this->user->id).'.pdf');
+    }
+
+    public function testDeleteToDo()
+    {
+        $toDo = ToDo::first();
+
+        $response = $this->delete( '/api/delete-to-do/'.$toDo->id.'/'.$this->user->id);
+
+        $this->assertMatchesJsonSnapshot($response->getContent());
+    }
+
+    public function testUserCannotDeleteAnotherUsersToDo()
+    {
+        $newUser = $this->getNewTestUser();
+
+        $toDo = ToDo::create([
+            'user_id' => $newUser->id,
+            'title'   => 'New Users To Do',
+        ]);
+
+        $response = $this->delete( '/api/delete-to-do/'.$toDo->id.'/'.$this->user->id);
+
+        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
+    }
+
+    public function testUserCannotAccessAnotherUsersToDo()
+    {
+        $newUser = $this->getNewTestUser();
+
+        $response = $this->get( '/api/get-to-dos/'.$newUser->id);
+
+        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
+    }
+
+    public function testMarkToDoAsComplete()
+    {
+        $toDo = ToDo::where('is_complete', '=', false)->first();
+
+        $this->post( '/api/toggle-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'complete' => true,
+        ]);
+
+        $toDo->refresh();
+
+        $this->assertEquals(true, $toDo->is_complete);
+    }
+
+    public function testMarkToDoAsIncomplete()
+    {
+        $toDo = ToDo::where('is_complete', '=', true)->first();
+
+        $this->post( '/api/toggle-to-do/'.$toDo->id.'/'.$this->user->id, [
+            'complete' => false,
+        ]);
+
+        $toDo->refresh();
+
+        $this->assertEquals(false, $toDo->is_complete);
     }
 }

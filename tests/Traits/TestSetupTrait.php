@@ -26,6 +26,16 @@ trait TestSetupTrait
         return $this;
     }
 
+    /**
+     * @return \App\User
+     */
+    protected function getNewTestUser(): User
+    {
+        return factory(User::class, 1)
+            ->create()
+            ->first();
+    }
+
     protected function logUserIn(): void
     {
         $this->actingAs($this->user);
@@ -41,16 +51,16 @@ trait TestSetupTrait
     {
         for ($i = 0; $i <= $number; $i++) {
 
-            $complete = $i % 2 === 0;
+            $is_complete = $i % 2 === 0;
 
             ToDo::create([
-                'user_id'   => $this->user->id,
-                'title'     => 'Test To Do #'.($i + 1),
-                'body'      => 'This is the To Do body for To Do #'.($i + 1),
-                'due_date'  => null,
-                'remind_at' => null,
-                'image'     => null,
-                'complete'  => $complete
+                'user_id'     => $this->user->id,
+                'title'       => 'Test To Do #' . ($i + 1),
+                'body'        => 'This is the To Do body for To Do #' . ($i + 1),
+                'due_date'    => null,
+                'remind_at'   => null,
+                'image'       => null,
+                'is_complete' => $is_complete
             ]);
         }
 

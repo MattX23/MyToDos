@@ -1,0 +1,126 @@
+{
+    "incomplete": [
+        {
+            "attachment": null,
+            "body": "This is the To Do body for To Do #2",
+            "is_complete": false,
+            "due_date": "2020-11-11",
+            "id": 2,
+            "image": null,
+            "remind_at": "",
+            "remind_at_time": "",
+            "title": "Test To Do #2",
+            "user_id": "1"
+        },
+        {
+            "attachment": null,
+            "body": "This is the To Do body for To Do #4",
+            "is_complete": false,
+            "due_date": "2020-11-13",
+            "id": 4,
+            "image": null,
+            "remind_at": "",
+            "remind_at_time": "",
+            "title": "Test To Do #4",
+            "user_id": "1"
+        },
+        {
+            "attachment": null,
+            "body": "This is the To Do body for To Do #6",
+            "is_complete": false,
+            "due_date": "2020-11-15",
+            "id": 6,
+            "image": null,
+            "remind_at": "",
+            "remind_at_time": "",
+            "title": "Test To Do #6",
+            "user_id": "1"
+        },
+        {
+            "attachment": null,
+            "body": "This is the To Do body for To Do #8",
+            "is_complete": false,
+            "due_date": "2020-11-17",
+            "id": 8,
+            "image": null,
+            "remind_at": "",
+            "remind_at_time": "",
+            "title": "Test To Do #8",
+            "user_id": "1"
+        },
+        {
+            "attachment": null,
+            "body": "This is the To Do body for To Do #10",
+            "is_complete": false,
+            "due_date": "2020-11-19",
+            "id": 10,
+            "image": null,
+            "remind_at": "",
+            "remind_at_time": "",
+            "title": "Test To Do #10",
+            "user_id": "1"
+        }
+    ],
+    "complete": [
+        {
+            "attachment": null,
+            "body": "This is the To Do body for To Do #3",
+            "is_complete": true,
+            "due_date": "2020-11-12",
+            "id": 3,
+            "image": null,
+            "remind_at": "",
+            "remind_at_time": "",
+            "title": "Test To Do #3",
+            "user_id": "1"
+        },
+        {
+            "attachment": null,
+            "body": "This is the To Do body for To Do #5",
+            "is_complete": true,
+            "due_date": "2020-11-14",
+            "id": 5,
+            "image": null,
+            "remind_at": "",
+            "remind_at_time": "",
+            "title": "Test To Do #5",
+            "user_id": "1"
+        },
+        {
+            "attachment": null,
+            "body": "This is the To Do body for To Do #7",
+            "is_complete": true,
+            "due_date": "2020-11-16",
+            "id": 7,
+            "image": null,
+            "remind_at": "",
+            "remind_at_time": "",
+            "title": "Test To Do #7",
+            "user_id": "1"
+        },
+        {
+            "attachment": null,
+            "body": "This is the To Do body for To Do #9",
+            "is_complete": true,
+            "due_date": "2020-11-18",
+            "id": 9,
+            "image": null,
+            "remind_at": "",
+            "remind_at_time": "",
+            "title": "Test To Do #9",
+            "user_id": "1"
+        },
+        {
+            "attachment": null,
+            "body": "This is the To Do body for To Do #11",
+            "is_complete": true,
+            "due_date": "2020-11-20",
+            "id": 11,
+            "image": null,
+            "remind_at": "",
+            "remind_at_time": "",
+            "title": "Test To Do #11",
+            "user_id": "1"
+        }
+    ]
+}

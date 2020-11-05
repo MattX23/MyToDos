@@ -2,22 +2,36 @@
 
 namespace App\Traits;
 
-use Carbon\Carbon;
+use App\ToDo;
 
 /**
  * @property string $dueDate
  * @property string $remindAt
+ * @property string $remindAtTime
  */
 trait ToDoRequestTrait
 {
-    protected function prepareForValidation()
+    protected function prepareForValidation(): void
     {
-        if ($this->dueDate && $this->remindAt) {
+        if ($this->remindAtTime) {
+            $time = $this->remindAtTime < 10 ? "0$this->remindAtTime" : $this->remindAtTime;
             $this->merge([
-                'remindAt' => Carbon::parse($this->dueDate)
-                    ->subDays($this->remindAt)
-                    ->format('Y-m-d'),
+                'remindAtTime' => "$time:00",
             ]);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function userIsAuthorised(): bool
+    {
+        $toDoId = $this->route('toDo')->id;
+        $userId = $this->route('user')->id;
+
+        return ToDo
+            ::where('id', '=', $toDoId)
+            ->where('user_id', '=', $userId)
+            ->exists();
     }
 }

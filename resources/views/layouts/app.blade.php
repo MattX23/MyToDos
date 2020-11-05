@@ -29,7 +29,7 @@
     <div id="app">
         @include('layouts.partials.navbar')
 
-        <main class="py-4">
+        <main class="py-4 overlay">
             @yield('content')
         </main>
     </div>

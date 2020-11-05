@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\ToDos;
 
-use App\ToDo;
 use App\Traits\ToDoRequestTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreToDo extends FormRequest
+class ToggleToDo extends FormRequest
 {
     use ToDoRequestTrait;
 
@@ -15,9 +14,9 @@ class StoreToDo extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return true;
+        return $this->userIsAuthorised();
     }
 
     /**
@@ -25,8 +24,10 @@ class StoreToDo extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
-        return ToDo::RULES;
+        return [
+            'complete' => 'required|bool',
+        ];
     }
 }

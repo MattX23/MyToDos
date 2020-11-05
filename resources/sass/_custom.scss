@@ -61,6 +61,10 @@ button, input {
     margin-bottom: 0;
 }
 
+.overlay {
+    background: $black-semi-transparent;
+}
+
 .round-image {
     width: 65px;
     height: 65px;
@@ -69,4 +73,8 @@ button, input {
 
 .small-text {
     font-size: $font-size-sm;
+}
+
+.strike-through {
+    text-decoration: line-through;
 }
