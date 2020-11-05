@@ -42,7 +42,7 @@
                                 <img class="todo-image round-image" :src="todo.image" alt="">
                             </div>
                             <div v-else class="col-2">
-                                <div class="image-placeholder round-image">{{ todo.title.substring(0, 1) }}</div>
+                                <div class="image-placeholder round-image">{{ todo.title.substring(0, 1).toUpperCase() }}</div>
                             </div>
                         </div>
                         <div class="col-12 toolbar-row">
