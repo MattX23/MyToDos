@@ -143,11 +143,10 @@ export default {
             axios.post(`${TOGGLE_TO_DO_ROUTE}${todoId}/${this.$props.userId}`, data)
                 .then(response => {
                     EventBus.$emit('update-todos', response.data);
+                    const message = isComplete ? '✅ Nice! To Do completed!' : '🔄 To Do marked as In Progress!';
+                    EventBus.$emit('show-flash-message', message, 'success');
                 })
-                //todo create alert
-                .catch(errors => {
-                    alert("Something went wrong");
-                })
+                .catch(() => EventBus.$emit('show-flash-message', '⚠️ Something went wrong', 'danger'))
         }
     }
 }

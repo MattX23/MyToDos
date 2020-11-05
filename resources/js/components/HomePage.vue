@@ -28,11 +28,17 @@
             :is-active="isDeleteTodoModalActive"
             :todo="activeTodoDelete"
         ></modal-delete-todo>
+        <alert
+            :level="alert.level"
+            :message="alert.message"
+            :show-alert="showAlert"
+        ></alert>
     </div>
 </template>
 
 <script>
 import { EventBus } from "../eventbus/event-bus";
+import { TWO_SECOND_TIMEOUT } from "../helpers/constants";
 
 const GET_TO_DOS_ROUTE = '/api/get-to-dos/';
 
@@ -68,6 +74,18 @@ export default {
             this.complete = todos.complete;
             this.incomplete = todos.incomplete;
         });
+        EventBus.$on('show-flash-message', (message, level) => {
+            this.showAlert = true;
+            this.alert.message = message;
+            this.alert.level = level;
+        });
+        EventBus.$on('hide-flash-message', () => {
+            this.showAlert = false;
+            setTimeout(function() {
+                this.alert.message = null;
+                this.alert.level = null;
+            }, TWO_SECOND_TIMEOUT)
+        });
     },
     mounted() {
         this.getToDos();
@@ -77,12 +95,17 @@ export default {
             activeTodo: null,
             activeTodoDelete: null,
             activeTodoView: null,
+            alert: {
+                level: null,
+                message: '',
+            },
             complete: [],
             incomplete: [],
             isAddTodoModalActive: false,
             isDeleteTodoModalActive: false,
             isBlurred: false,
             isViewTodoModalActive: false,
+            showAlert: false,
         }
     },
     methods: {
@@ -95,9 +118,9 @@ export default {
                 .then(response => {
                     this.complete = response.data.complete;
                     this.incomplete = response.data.incomplete;
+                    EventBus.$emit('show-flash-message', '⚠️ Something went wrong', 'danger')
                 })
-                //todo create alert
-                .catch(() => alert('something went wrong'));
+                .catch(() => EventBus.$emit('show-flash-message', '⚠️ Something went wrong', 'danger'));
         }
     }
 }
