@@ -9,6 +9,7 @@ use App\ToDo;
 use App\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class HandleFilesService implements HandleFilesContract
 {
@@ -59,15 +60,28 @@ class HandleFilesService implements HandleFilesContract
      *
      * @throws \Exception
      */
-    public function removeExistingUploadsAndRelationships(ToDo $toDo, bool $shouldDeleteImage, bool $shouldDeleteAttachment): void
-    {
-        if ($shouldDeleteImage && $toDo->image) $this->removeUpload(
-            ToDo::IMAGE_DISPLAY_PATH,
-            $toDo->image,
-            ToDo::IMAGE_FILE_PATH
-        );
+    public function removeExistingUploadsAndRelationships(
+        ToDo $toDo,
+        bool $shouldDeleteImage,
+        bool $shouldDeleteAttachment
+    ): void {
+        if (
+            $shouldDeleteImage &&
+            $toDo->image &&
+            $this->isNotATestFile($toDo->image)
+        ) {
+            $this->removeUpload(
+                ToDo::IMAGE_DISPLAY_PATH,
+                $toDo->image,
+                ToDo::IMAGE_FILE_PATH
+            );
+        }
 
-        if ($shouldDeleteAttachment && $toDo->attachment) {
+        if (
+            $shouldDeleteAttachment &&
+            $toDo->attachment &&
+            $this->isNotATestFile($toDo->attachment->file_path)
+        ) {
             $this->removeUpload(
                 ToDo::ATTACHMENT_DISPLAY_PATH,
                 $toDo->attachment->file_path,
@@ -121,5 +135,15 @@ class HandleFilesService implements HandleFilesContract
     public function getUploadName(string $filename, string $extension, int $userId): string
     {
         return md5($filename.$userId).'.'.$extension;
+    }
+
+    /**
+     * @param string $filePath
+     *
+     * @return bool
+     */
+    protected function isNotATestFile(string $filePath): bool
+    {
+        return !Str::contains($filePath, 'seed_files');
     }
 }
