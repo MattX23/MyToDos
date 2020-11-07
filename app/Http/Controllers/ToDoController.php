@@ -13,6 +13,7 @@ use App\Http\Requests\ToDos\ViewToDo;
 use App\ToDo;
 use App\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 
 class ToDoController extends Controller
 {
@@ -50,15 +51,7 @@ class ToDoController extends Controller
             'image'     => $imageName,
         ]);
 
-        if ($attachment) {
-            $attachmentDisplayPath = $handleFilesService->storeAttachment($attachment, $toDo);
-
-            Attachment::create([
-                'to_do_id'     => $toDo->id,
-                'display_name' => $attachment->getClientOriginalName(),
-                'file_path'    => $attachmentDisplayPath,
-            ]);
-        }
+        if ($attachment) $this->storeAttachment($handleFilesService, $attachment, $toDo);
 
         return $this->apiResponse($this->getToDos($user));
     }
@@ -111,7 +104,7 @@ class ToDoController extends Controller
             'image'     => $imageName,
         ]);
 
-        if ($attachment) $handleFilesService->storeAttachment($attachment, $toDo);
+        if ($attachment) $this->storeAttachment($handleFilesService, $attachment, $toDo);
 
         return $this->apiResponse($this->getToDos($user));
     }
@@ -150,6 +143,22 @@ class ToDoController extends Controller
             'incomplete' => isset($toDos[0]) ? $toDos[0] : [],
             'complete'   => isset($toDos[1]) ? $toDos[1] : [],
         ];
+    }
+
+    /**
+     * @param \App\Http\Contracts\HandleFilesContract $handleFilesService
+     * @param \Illuminate\Http\UploadedFile           $attachment
+     * @param \App\ToDo                               $toDo
+     */
+    protected function storeAttachment(HandleFilesContract $handleFilesService, UploadedFile $attachment, ToDo $toDo): void
+    {
+        $attachmentDisplayPath = $handleFilesService->storeAttachment($attachment, $toDo);
+
+        Attachment::create([
+            'to_do_id'     => $toDo->id,
+            'display_name' => $attachment->getClientOriginalName(),
+            'file_path'    => $attachmentDisplayPath,
+        ]);
     }
 
     /**

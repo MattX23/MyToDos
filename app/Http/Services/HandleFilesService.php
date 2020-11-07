@@ -58,7 +58,7 @@ class HandleFilesService implements HandleFilesContract
      */
     public function removeFile(ToDo $toDo, string $type): void
     {
-        if ($type === ToDo::IMAGE && $this->isNotATestFile($toDo->image)) {
+        if ($type === ToDo::IMAGE && $toDo->image && $this->isNotATestFile($toDo->image)) {
             $this->deleteFile(
                 ToDo::IMAGE_DISPLAY_PATH,
                 $toDo->image,
@@ -66,7 +66,7 @@ class HandleFilesService implements HandleFilesContract
             );
         }
 
-        if ($type === ToDo::ATTACHMENT && $this->isNotATestFile($toDo->attachment->file_path)) {
+        if ($type === ToDo::ATTACHMENT && $toDo->attachment && $this->isNotATestFile($toDo->attachment->file_path)) {
             $this->deleteFile(
                 ToDo::ATTACHMENT_DISPLAY_PATH,
                 $toDo->attachment->file_path,
