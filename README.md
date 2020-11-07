@@ -19,5 +19,6 @@ Users are also able to opt-in to email reminders when a due date is set on a To 
 - Run `npm install`
 - Run `npm run dev`
 - Create seed users: `php artisan db:seed`
+- To run tests: `vendor/bin/phpunit`
 
 ## Screenshots
