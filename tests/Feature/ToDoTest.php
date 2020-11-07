@@ -82,7 +82,6 @@ class ToDoTest extends TestCase
 
     public function testStoreToDoWithAttachment()
     {
-        Storage::fake('local');
         $file = UploadedFile::fake()->create('file.pdf');
 
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
@@ -95,8 +94,6 @@ class ToDoTest extends TestCase
 
     public function testAttachmentIsUploaded()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title'      => 'Test To Do',
             'attachment' => UploadedFile::fake()->create('file.pdf')
@@ -107,7 +104,6 @@ class ToDoTest extends TestCase
 
     public function testStoreToDoWithOversizedAttachment()
     {
-        Storage::fake('local');
         $file = UploadedFile::fake()->create('file.pdf')->size(5000);
 
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
@@ -117,12 +113,11 @@ class ToDoTest extends TestCase
 
         $response
             ->assertSessionHasErrors('attachment')
-            ->assertStatus(302);
+            ->assertStatus(Response::HTTP_FOUND);
     }
 
     public function testStoreToDoWithImage()
     {
-        Storage::fake('local');
         $image = UploadedFile::fake()->create('image.jpg');
 
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
@@ -135,8 +130,6 @@ class ToDoTest extends TestCase
 
     public function testImageIsUploaded()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title' => 'Test To Do',
             'image' => UploadedFile::fake()->create('image.png')
@@ -147,7 +140,6 @@ class ToDoTest extends TestCase
 
     public function testStoreToDoWithOversizedImage()
     {
-        Storage::fake('local');
         $image = UploadedFile::fake()->create('image.jpg')->size(5000);
 
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
@@ -157,7 +149,7 @@ class ToDoTest extends TestCase
 
         $response
             ->assertSessionHasErrors('image')
-            ->assertStatus(302);
+            ->assertStatus(Response::HTTP_FOUND);
     }
 
     public function testStoreWithDueDateInPast()
@@ -169,7 +161,7 @@ class ToDoTest extends TestCase
 
         $response
             ->assertSessionHasErrors('dueDate')
-            ->assertStatus(302);
+            ->assertStatus(Response::HTTP_FOUND);
     }
 
     public function testStoreWithRemindAtAfterDueDate()
@@ -183,7 +175,7 @@ class ToDoTest extends TestCase
 
         $response
             ->assertSessionHasErrors('remindAt')
-            ->assertStatus(302);
+            ->assertStatus(Response::HTTP_FOUND);
     }
 
     public function testStoreWithReminderBeforeDueDate()
@@ -196,7 +188,7 @@ class ToDoTest extends TestCase
 
         $response
             ->assertSessionHasErrors( 'remindAt')
-            ->assertStatus(302);
+            ->assertStatus(Response::HTTP_FOUND);
     }
 
     public function testEditToDo()
@@ -229,13 +221,11 @@ class ToDoTest extends TestCase
             'body'     => 'A new To Do body',
         ]);
 
-        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     public function testImageIsRemovedWhenNewImageUploaded()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title' => 'Test Image Removal To Do',
             'image' => UploadedFile::fake()->create('image.png')
@@ -251,10 +241,8 @@ class ToDoTest extends TestCase
         Storage::disk('local')->assertMissing('public/images/'.md5('image.png'.$this->user->id).'.png');
     }
 
-    public function testImageIsRemovedWhenWhenUserDeletesImage()
+    public function testImageIsRemovedWhenUserDeletesImage()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title' => 'Test Image Removal To Do',
             'image' => UploadedFile::fake()->create('image.jpg')
@@ -272,8 +260,6 @@ class ToDoTest extends TestCase
 
     public function testAttachmentIsRemovedWhenNewAttachmentUploaded()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title'      => 'Test Attachment Removal To Do',
             'attachment' => UploadedFile::fake()->create('file.pdf')
@@ -289,10 +275,8 @@ class ToDoTest extends TestCase
         Storage::disk('local')->assertMissing('public/attachments/'.md5('file.pdf'.$this->user->id).'.pdf');
     }
 
-    public function testAttachmentIsRemovedWhenWhenUserDeletesAttachment()
+    public function testAttachmentIsRemovedWhenUserDeletesAttachment()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title'      => 'Test Attachment Removal To Do',
             'attachment' => UploadedFile::fake()->create('file.pdf')
@@ -328,7 +312,7 @@ class ToDoTest extends TestCase
 
         $response = $this->delete( '/api/delete-to-do/'.$toDo->id.'/'.$this->user->id);
 
-        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     public function testUserCannotAccessAnotherUsersToDo()
@@ -337,7 +321,7 @@ class ToDoTest extends TestCase
 
         $response = $this->get( '/api/get-to-dos/'.$newUser->id);
 
-        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     public function testMarkToDoAsComplete()

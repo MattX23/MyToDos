@@ -17,7 +17,7 @@ class Attachment extends Model implements Arrayable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var string[]
      */
     protected $fillable = [
         'to_do_id',
@@ -34,7 +34,7 @@ class Attachment extends Model implements Arrayable
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function toArray(): array
     {

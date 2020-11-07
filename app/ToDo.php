@@ -26,6 +26,9 @@ class ToDo extends Model implements Arrayable
     const ATTACHMENT_FILE_PATH = 'public/attachments';
     const IMAGE_FILE_PATH = '/public/images';
     const IMAGE_DISPLAY_PATH = '/images/';
+    const ATTACHMENT = 'attachment';
+    const IMAGE = 'image';
+
     const RULES = [
         'attachment'   => 'nullable|file|max:4096',
         'body'         => 'nullable|string',
@@ -72,6 +75,15 @@ class ToDo extends Model implements Arrayable
         'remind_at_time',
     ];
 
+    public static function boot() : void
+    {
+        parent::boot();
+
+        static::deleting(function(ToDo $toDo) {
+            $toDo->attachment()->delete();
+        });
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -86,15 +98,6 @@ class ToDo extends Model implements Arrayable
     public function attachment(): HasOne
     {
         return $this->hasOne(Attachment::class);
-    }
-
-    public static function boot() : void
-    {
-        parent::boot();
-
-        static::deleting(function(ToDo $toDo) {
-            $toDo->attachment()->delete();
-        });
     }
 
     /**

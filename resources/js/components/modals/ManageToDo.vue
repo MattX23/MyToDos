@@ -1,12 +1,11 @@
 <template>
     <div
-            :class="{ 'is-active' : isActive }"
-            aria-labelledby=""
-            aria-hidden="true"
-            class="modal"
-            id="input-modal"
-            role="dialog"
-            tabindex="-1"
+        :class="{ 'is-active' : isActive }"
+        aria-hidden="true"
+        class="modal"
+        id="input-modal"
+        role="dialog"
+        tabindex="-1"
     >
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -33,7 +32,7 @@
                                     <div class="col-9">
                                         <input
                                             @keydown="clearError('title')"
-                                            v-model="todo.title"
+                                            v-model="toDo.title"
                                             class="form-control"
                                             id="title"
                                             placeholder="What do you need to do?"
@@ -49,7 +48,7 @@
                                     <div class="col-9">
                                         <textarea
                                             @keydown="clearError('body')"
-                                            v-model="todo.body"
+                                            v-model="toDo.body"
                                             class="form-control"
                                             id="details"
                                             placeholder="Additional info"
@@ -65,7 +64,7 @@
                                     <div class="col-9">
                                         <input
                                             @focus="clearError('dueDate')"
-                                            v-model="todo.dueDate"
+                                            v-model="toDo.dueDate"
                                             class="form-control"
                                             id="due_date"
                                             type="date"
@@ -80,7 +79,7 @@
                                     <div class="col-9">
                                         <input
                                             @focus="clearError('remindAt')"
-                                            v-model="todo.remindAt"
+                                            v-model="toDo.remindAt"
                                             class="form-control"
                                             id="remind_at"
                                             type="date"
@@ -88,13 +87,13 @@
                                         <span v-if="errors.remindAt" class="error">{{ errors.remindAt }}</span>
                                     </div>
                                 </div>
-                                <div v-if="todo.remindAt" class="row margin-btm-sm">
+                                <div v-if="toDo.remindAt" class="row margin-btm-sm">
                                     <div class="col-3 label">
                                         <label>At:</label>
                                     </div>
                                     <div class="col-9">
                                         <select
-                                            v-model="todo.remindAtTime"
+                                            v-model="toDo.remindAtTime"
                                             class="form-control"
                                         >
                                             <option v-for="(_, hour) in 24" :value="hour" :key="hour">{{ hour }}:00 {{ getTimeOfDay(hour) }}</option>
@@ -136,7 +135,13 @@
                                     </div>
                                     <div class="col-7">
                                         <p id="attachment">
-                                            <a :href="activeToDo.attachment.file_path" target="_blank" title="Download">{{ activeToDo.attachment.display_name }}</a>
+                                            <a
+                                                :href="activeToDo.attachment.file_path"
+                                                target="_blank"
+                                                title="Download"
+                                            >
+                                                {{ activeToDo.attachment.display_name }}
+                                            </a>
                                         </p>
                                     </div>
                                     <div class="col-2">
@@ -221,7 +226,7 @@ export default {
             reminderDays: {},
             showAttachmentField: false,
             showImageField: false,
-            todo: {
+            toDo: {
                 attachment: null,
                 body: '',
                 deleteAttachment: false,
@@ -240,7 +245,7 @@ export default {
             return this.isEditing && this.activeToDo.attachment ? "Change:" : "Attachment";
         },
         dueDate() {
-            return this.todo.dueDate;
+            return this.toDo.dueDate;
         },
         imageLabel() {
             return this.isEditing && this.activeToDo.image ? "Change:" : "Image:";
@@ -250,7 +255,8 @@ export default {
         },
         shouldShowReminder() {
             const today = moment().format('YYYY-MM-DD');
-            return (this.todo.dueDate && this.todo.dueDate > today) ||
+
+            return (this.toDo.dueDate && this.toDo.dueDate > today) ||
                 (this.activeToDo && this.activeToDo.remind_at);
         },
         submitButtonText() {
@@ -260,28 +266,30 @@ export default {
     watch: {
         activeToDo: function(val) {
             if (val) {
+                this.isEditing = true;
                 this.showAttachmentField = true;
                 this.showImageField = true;
-                this.isEditing = true;
-                this.todo.remindAt = this.$props.activeToDo.remind_at;
-                this.todo.remindAtTime = this.todo.remindAt ? this.$props.activeToDo.remind_at_time : REMIND_AT_DEFAULT_TIME;
-                this.todo.body = this.$props.activeToDo.body;
-                this.todo.dueDate = this.$props.activeToDo.due_date;
-                this.todo.existingAttachment = this.$props.activeToDo.attachment ? this.$props.activeToDo.attachment.display_name : {};
-                this.todo.existingImage = this.$props.activeToDo.image;
-                this.todo.id = this.$props.activeToDo.id;
-                this.todo.title = this.$props.activeToDo.title;
+                this.toDo.body = this.$props.activeToDo.body;
+                this.toDo.dueDate = this.$props.activeToDo.due_date;
+                this.toDo.existingAttachment = this.$props.activeToDo.attachment ?
+                    this.$props.activeToDo.attachment.display_name :
+                    {};
+                this.toDo.existingImage = this.$props.activeToDo.image;
+                this.toDo.id = this.$props.activeToDo.id;
+                this.toDo.remindAt = this.$props.activeToDo.remind_at;
+                this.toDo.remindAtTime = this.toDo.remindAt ?
+                    this.$props.activeToDo.remind_at_time :
+                    REMIND_AT_DEFAULT_TIME;
+                this.toDo.title = this.$props.activeToDo.title;
             } else {
-                this.todo.remindAtTime = REMIND_AT_DEFAULT_TIME;
-                this.showAttachmentField = false;
-                this.showImageField = false;
-                this.showAttachmentField = false;
-                this.showImageField = false;
                 this.isEditing = false;
+                this.showAttachmentField = false;
+                this.showImageField = false;
+                this.toDo.remindAtTime = REMIND_AT_DEFAULT_TIME;
             }
         },
         dueDate: function (val) {
-            if (val === null || val === "") this.todo.remindAt = "";
+            if (val === null || val === "") this.toDo.remindAt = "";
         },
     },
     methods: {
@@ -295,9 +303,9 @@ export default {
             this.errors[error] = '';
         },
         clearFields() {
-            const fieldObj = this.todo;
+            const fieldObj = this.toDo;
             for (const key of Object.keys(fieldObj)) {
-                this.todo[key] = '';
+                this.toDo[key] = '';
             }
         },
         closeModal() {
@@ -309,35 +317,35 @@ export default {
             return hour < 12 ? 'AM' : 'PM';
         },
         reminderIsBeforeDueDate() {
-            return moment(this.todo.dueDate).format('YYYY-MM-DD') >
-                moment(this.todo.remindAt).format('YYYY-MM-DD');
+            return moment(this.toDo.dueDate).format('YYYY-MM-DD') >
+                moment(this.toDo.remindAt).format('YYYY-MM-DD');
         },
         reminderIsInTheFuture() {
             return moment().add(1, 'days').format('YYYY-MM-DD') <=
-                moment(this.todo.remindAt).format('YYYY-MM-DD');
+                moment(this.toDo.remindAt).format('YYYY-MM-DD');
         },
         removeAttachment() {
-            this.todo.deleteAttachment = true;
             this.showAttachmentField = false;
+            this.toDo.deleteAttachment = true;
         },
         removeImage() {
-            this.todo.deleteImage = true;
             this.showImageField = false;
+            this.toDo.deleteImage = true;
         },
         selectFile(type) {
             if (type === 'image') {
-                this.todo.image = event.target.files[0];
+                this.toDo.image = event.target.files[0];
             }
 
             if (type === 'file') {
-                this.todo.attachment = event.target.files[0];
+                this.toDo.attachment = event.target.files[0];
             }
         },
         submitToDo() {
             if (this.validateData()) {
                 const formData = new FormData();
 
-                Object.entries(this.todo).forEach(
+                Object.entries(this.toDo).forEach(
                     part => {
                         if (part[1]) formData.append(part[0], part[1])
                     }
@@ -346,7 +354,7 @@ export default {
                 let route = STORE_TO_DO_ROUTE;
 
                 if (this.isEditing) {
-                    route = `${EDIT_TO_DO_ROUTE}${this.todo.id}/`;
+                    route = `${EDIT_TO_DO_ROUTE}${this.toDo.id}/`;
                     formData.append('_method', 'PUT')
                 }
 
@@ -369,19 +377,19 @@ export default {
             let isValid = true;
             this.clearAllErrors();
 
-            if (this.todo.title.length < 2) {
+            if (this.toDo.title.length < 2) {
                 this.errors.title = 'The title must be at least two characters';
                 isValid = false;
             }
 
-            if (this.todo.dueDate) {
-                if (this.todo.dueDate < this.today) {
+            if (this.toDo.dueDate) {
+                if (this.toDo.dueDate < this.today) {
                     this.errors.dueDate = 'The due date cannot be in the past';
                     isValid = false;
                 }
             }
 
-            if (this.todo.remindAt) {
+            if (this.toDo.remindAt) {
                 if (! this.reminderIsInTheFuture()) {
                     this.errors.remindAt = 'Reminders cannot be set in the past';
                     isValid = false;

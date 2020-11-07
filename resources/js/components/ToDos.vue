@@ -10,44 +10,44 @@
         </header>
         <div class="row">
             <div class="col-12 todo-container">
-                <div v-if="!todos.length" class="empty-container">{{ emptyContainerText }}</div>
-                <div v-else v-for="todo in todos">
+                <div v-if="!toDos.length" class="empty-container">{{ emptyContainerText }}</div>
+                <div v-else v-for="toDo in toDos">
                     <article
-                        :key="todo.id"
+                        :key="toDo.id"
                         class="todo-item"
                     >
                         <div class="row">
                             <div class="col-10">
                                 <span id="todo-header">
-                                    <input v-if="!complete" @click="toggleToDoStatus(todo.id, true)" type="checkbox">
-                                    <span id="todo-header-text" :class="{ 'strike-through' : complete }">{{ todo.title }}</span>
+                                    <input v-if="!complete" @click="toggleToDoStatus(toDo.id, true)" type="checkbox">
+                                    <span id="todo-header-text" :class="{ 'strike-through' : complete }">{{ toDo.title }}</span>
                                 </span>
                                 <div v-if="!complete" class="row">
-                                    <div class="d-none d-lg-block col-6" v-if="todo.due_date">
+                                    <div class="d-none d-lg-block col-6" v-if="toDo.due_date">
                                         <div
-                                            :class="[ isOverDue(todo.due_date) ? 'btn-danger inactive-btn-danger ' : 'btn-warning inactive-btn-warning' ]"
+                                            :class="[ isOverDue(toDo.due_date) ? 'btn-danger inactive-btn-danger ' : 'btn-warning inactive-btn-warning' ]"
                                             class="btn btn-pill drop-shadow margin-left"
                                             title="Due date"
-                                        ><i class="zmdi zmdi-calendar"></i> {{ todo.due_date }}</div>
+                                        ><i class="zmdi zmdi-calendar"></i> {{ toDo.due_date }}</div>
                                     </div>
-                                    <div class="d-none d-lg-block col-6" v-if="todo.remind_at">
+                                    <div class="d-none d-lg-block col-6" v-if="toDo.remind_at">
                                         <div
                                             class="btn btn-pill btn-info inactive-btn-info drop-shadow float-left"
                                             title="Reminder set"
-                                        ><i class="zmdi zmdi-time"></i> {{ todo.remind_at.substr(0, 10) }}</div>
+                                        ><i class="zmdi zmdi-time"></i> {{ toDo.remind_at.substr(0, 10) }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div v-if="todo.image" class="col-2">
-                                <img class="todo-image round-image" :src="todo.image" alt="">
+                            <div v-if="toDo.image" class="col-2">
+                                <img class="todo-image round-image" :src="toDo.image" alt="">
                             </div>
                             <div v-else class="col-2">
-                                <div class="image-placeholder round-image">{{ todo.title.substring(0, 1).toUpperCase() }}</div>
+                                <div class="image-placeholder round-image">{{ toDo.title.substring(0, 1).toUpperCase() }}</div>
                             </div>
                         </div>
                         <div class="col-12 toolbar-row">
                             <button
-                                @click="openViewToDoModal(todo)"
+                                @click="openViewToDoModal(toDo)"
                                 class="btn btn-sm btn-round btn-secondary"
                                 title="View To Do"
                             >
@@ -55,14 +55,14 @@
                             </button>
                             <button
                                 v-if="!complete"
-                                @click="openInputToDoModal(todo)"
+                                @click="openInputToDoModal(toDo)"
                                 class="btn btn-sm btn-round btn-secondary"
                                 title="Edit To Do"
                             >
                                 <i class="zmdi zmdi-edit"></i>
                             </button>
                             <button
-                                @click="openDeleteToDoModal(todo)"
+                                @click="openDeleteToDoModal(toDo)"
                                 class="btn btn-sm btn-round btn-secondary"
                                 title="Delete To Do"
                             >
@@ -70,13 +70,13 @@
                             </button>
                             <button
                                 v-if="complete"
-                                @click="toggleToDoStatus(todo.id, false)"
+                                @click="toggleToDoStatus(toDo.id, false)"
                                 class="btn btn-sm btn-round btn-secondary"
                                 title="Add to In Progress"
                             >
                                 <i class="zmdi zmdi-refresh"></i>
                             </button>
-                            <span v-if="hasAttachment(todo)" class="has-attachment">
+                            <span v-if="hasAttachment(toDo)" class="has-attachment">
                                     <i class="zmdi zmdi-attachment-alt"></i>
                             </span>
                         </div>
@@ -99,7 +99,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        todos: {
+        toDos: {
             type: Array,
             default: null
         },
@@ -115,32 +115,32 @@ export default {
         },
         headerText() {
             return !this.$props.complete ?
-                `In Progress (${this.$props.todos.length})` :
-                `Complete (${this.$props.todos.length})`;
+                `In Progress (${this.$props.toDos.length})` :
+                `Complete (${this.$props.toDos.length})`;
         }
     },
     methods: {
-        hasAttachment(todo) {
-            return todo.attachment;
+        hasAttachment(toDo) {
+            return toDo.attachment;
         },
         isOverDue(dueDate) {
             return moment(dueDate).isBefore();
         },
-        openDeleteToDoModal(todo) {
-            EventBus.$emit('modal-open-delete-todo', todo);
+        openDeleteToDoModal(toDo) {
+            EventBus.$emit('modal-open-delete-todo', toDo);
         },
-        openInputToDoModal(todo = null) {
-            EventBus.$emit('modal-open-manage-todo', todo);
+        openInputToDoModal(toDo = null) {
+            EventBus.$emit('modal-open-manage-todo', toDo);
         },
-        openViewToDoModal(todo) {
-            EventBus.$emit('modal-open-view-todo', todo);
+        openViewToDoModal(toDo) {
+            EventBus.$emit('modal-open-view-todo', toDo);
         },
-        toggleToDoStatus(todoId, isComplete) {
+        toggleToDoStatus(toDoId, isComplete) {
             const data = {
                 complete: isComplete
             };
 
-            axios.post(`${TOGGLE_TO_DO_ROUTE}${todoId}/${this.$props.userId}`, data)
+            axios.post(`${TOGGLE_TO_DO_ROUTE}${toDoId}/${this.$props.userId}`, data)
                 .then(response => {
                     EventBus.$emit('update-todos', response.data);
                     const message = isComplete ? '✅ Nice! To Do completed!' : '🔄 To Do marked as In Progress!';

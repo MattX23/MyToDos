@@ -16,7 +16,7 @@ class DeleteToDo extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->userIsAuthorised();
+        return $this->isUserAuthorised();
     }
 
     /**
