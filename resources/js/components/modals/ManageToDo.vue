@@ -291,6 +291,9 @@ export default {
         dueDate: function (val) {
             if (val === null || val === "") this.toDo.remindAt = "";
         },
+        isActive: function (val) {
+            if (val && !this.activeToDo) this.toDo.remindAtTime = REMIND_AT_DEFAULT_TIME;
+        },
     },
     methods: {
         clearAllErrors() {

@@ -8,7 +8,7 @@
                 id="addToDo"
             >+</span>
         </header>
-        <div class="row">
+        <div class="row to-dos-row">
             <div class="col-12 todo-container">
                 <div v-if="!toDos.length" class="empty-container">{{ emptyContainerText }}</div>
                 <div v-else v-for="toDo in toDos">
@@ -158,6 +158,7 @@ export default {
 .empty-container {
     font-size: 1.5rem;
     text-align: center;
+    margin-top: 50%;
 }
 .todo-container {
     background: $white-semi-transparent;
@@ -222,5 +223,8 @@ header {
     font-size: 1.2rem;
     position: relative;
     top: 2px;
+}
+.to-dos-row {
+    border: 1px solid $grey;
 }
 </style>
