@@ -82,7 +82,6 @@ class ToDoTest extends TestCase
 
     public function testStoreToDoWithAttachment()
     {
-        Storage::fake('local');
         $file = UploadedFile::fake()->create('file.pdf');
 
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
@@ -95,8 +94,6 @@ class ToDoTest extends TestCase
 
     public function testAttachmentIsUploaded()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title'      => 'Test To Do',
             'attachment' => UploadedFile::fake()->create('file.pdf')
@@ -107,7 +104,6 @@ class ToDoTest extends TestCase
 
     public function testStoreToDoWithOversizedAttachment()
     {
-        Storage::fake('local');
         $file = UploadedFile::fake()->create('file.pdf')->size(5000);
 
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
@@ -122,7 +118,6 @@ class ToDoTest extends TestCase
 
     public function testStoreToDoWithImage()
     {
-        Storage::fake('local');
         $image = UploadedFile::fake()->create('image.jpg');
 
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
@@ -135,8 +130,6 @@ class ToDoTest extends TestCase
 
     public function testImageIsUploaded()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title' => 'Test To Do',
             'image' => UploadedFile::fake()->create('image.png')
@@ -147,7 +140,6 @@ class ToDoTest extends TestCase
 
     public function testStoreToDoWithOversizedImage()
     {
-        Storage::fake('local');
         $image = UploadedFile::fake()->create('image.jpg')->size(5000);
 
         $response = $this->post( '/api/store-to-do/'.$this->user->id, [
@@ -234,8 +226,6 @@ class ToDoTest extends TestCase
 
     public function testImageIsRemovedWhenNewImageUploaded()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title' => 'Test Image Removal To Do',
             'image' => UploadedFile::fake()->create('image.png')
@@ -253,8 +243,6 @@ class ToDoTest extends TestCase
 
     public function testImageIsRemovedWhenUserDeletesImage()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title' => 'Test Image Removal To Do',
             'image' => UploadedFile::fake()->create('image.jpg')
@@ -272,8 +260,6 @@ class ToDoTest extends TestCase
 
     public function testAttachmentIsRemovedWhenNewAttachmentUploaded()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title'      => 'Test Attachment Removal To Do',
             'attachment' => UploadedFile::fake()->create('file.pdf')
@@ -291,8 +277,6 @@ class ToDoTest extends TestCase
 
     public function testAttachmentIsRemovedWhenUserDeletesAttachment()
     {
-        Storage::fake('local');
-
         $this->json('POST', '/api/store-to-do/'.$this->user->id, [
             'title'      => 'Test Attachment Removal To Do',
             'attachment' => UploadedFile::fake()->create('file.pdf')
