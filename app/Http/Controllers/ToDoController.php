@@ -72,8 +72,12 @@ class ToDoController extends Controller
      * @throws \Exception
      * @return \Illuminate\Http\JsonResponse
      */
-    public function edit(ToDo $toDo, User $user, UpdateToDo $request, HandleFilesContract $handleFilesService): JsonResponse
-    {
+    public function edit(
+        ToDo $toDo,
+        User $user,
+        UpdateToDo $request,
+        HandleFilesContract $handleFilesService
+    ): JsonResponse {
         $image = $request->file('image');
         $attachment = $request->file('attachment');
 
@@ -128,7 +132,6 @@ class ToDoController extends Controller
         HandleFilesContract $handleFilesService
     ): JsonResponse {
         $this->cleanUpFiles($toDo, $handleFilesService);
-
         $toDo->delete();
 
         return $this->apiResponse($this->getToDos($user));
@@ -166,17 +169,6 @@ class ToDoController extends Controller
     }
 
     /**
-     * @param string $date
-     * @param string $time
-     *
-     * @return string
-     */
-    protected function createRemindAtTimeStamp(string $date, string $time): string
-    {
-        return "$date $time:00";
-    }
-
-    /**
      * @param \App\Http\Requests\ToDos\ToDoRequest $request
      *
      * @return string|null
@@ -186,6 +178,17 @@ class ToDoController extends Controller
         return $request->get('remindAt') ?
             $this->createRemindAtTimeStamp($request->get('remindAt'), $request->get('remindAtTime')) :
             null;
+    }
+
+    /**
+     * @param string $date
+     * @param string $time
+     *
+     * @return string
+     */
+    protected function createRemindAtTimeStamp(string $date, string $time): string
+    {
+        return "$date $time:00";
     }
 
     /**

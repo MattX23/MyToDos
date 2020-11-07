@@ -24,7 +24,7 @@ trait ToDoRequestTrait
     /**
      * @return bool
      */
-    protected function userIsAuthorised(): bool
+    protected function isUserAuthorised(): bool
     {
         $toDoId = $this->route('toDo')->id;
         $userId = $this->route('user')->id;

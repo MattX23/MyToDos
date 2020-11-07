@@ -75,6 +75,15 @@ class ToDo extends Model implements Arrayable
         'remind_at_time',
     ];
 
+    public static function boot() : void
+    {
+        parent::boot();
+
+        static::deleting(function(ToDo $toDo) {
+            $toDo->attachment()->delete();
+        });
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -89,15 +98,6 @@ class ToDo extends Model implements Arrayable
     public function attachment(): HasOne
     {
         return $this->hasOne(Attachment::class);
-    }
-
-    public static function boot() : void
-    {
-        parent::boot();
-
-        static::deleting(function(ToDo $toDo) {
-            $toDo->attachment()->delete();
-        });
     }
 
     /**

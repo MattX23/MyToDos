@@ -47,7 +47,7 @@ class SendReminders extends Command
             ->get();
 
         $toDos->each(function(ToDo $toDo) use ($dateTime) {
-            $timeUntilDue = $this->getHumanReadableTimeUntil($toDo, $dateTime);
+            $timeUntilDue = $this->getHumanReadableTimeUntilDue($toDo, $dateTime);
 
             Mail::to($toDo->user->email)->send(new SendReminder($toDo, $timeUntilDue));
 
@@ -63,7 +63,7 @@ class SendReminders extends Command
      *
      * @return string
      */
-    protected function getHumanReadableTimeUntil(ToDo $toDo, string $dateTime): string
+    protected function getHumanReadableTimeUntilDue(ToDo $toDo, string $dateTime): string
     {
         return Carbon
             ::parse($toDo->due_date)

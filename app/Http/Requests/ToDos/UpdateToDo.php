@@ -16,7 +16,7 @@ class UpdateToDo extends ToDoRequest
      */
     public function authorize(): bool
     {
-        return $this->userIsAuthorised();
+        return $this->isUserAuthorised();
     }
 
     /**
