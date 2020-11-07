@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Attachment;
 use App\Http\Contracts\HandleFilesContract;
 use App\Http\Requests\ToDos\DeleteToDo;
 use App\Http\Requests\ToDos\StoreToDo;
@@ -49,7 +50,15 @@ class ToDoController extends Controller
             'image'     => $imageName,
         ]);
 
-        if ($attachment) $handleFilesService->storeAttachmentWithRelationship($attachment, $toDo);
+        if ($attachment) {
+            $attachmentDisplayPath = $handleFilesService->storeAttachment($attachment, $toDo);
+
+            Attachment::create([
+                'to_do_id'     => $toDo->id,
+                'display_name' => $attachment->getClientOriginalName(),
+                'file_path'    => $attachmentDisplayPath,
+            ]);
+        }
 
         return $this->apiResponse($this->getToDos($user));
     }
@@ -65,7 +74,22 @@ class ToDoController extends Controller
      */
     public function edit(ToDo $toDo, User $user, UpdateToDo $request, HandleFilesContract $handleFilesService): JsonResponse
     {
-        list($image, $attachment) = $handleFilesService->clearStorageForNewUploadsOrOnRequestByUser($toDo, $request);
+        $image = $request->file('image');
+        $attachment = $request->file('attachment');
+
+        if ((bool) $image || $request->get('deleteImage')) {
+            $handleFilesService->removeFile(
+                $toDo,
+                ToDo::IMAGE
+            );
+        }
+
+        if ((bool) $attachment || $request->get('deleteAttachment')) {
+            $handleFilesService->removeFile(
+                $toDo,
+                ToDo::ATTACHMENT
+            );
+        }
 
         $imageName = $image ?
             $handleFilesService->storeImage($image, $user) :
@@ -83,7 +107,7 @@ class ToDoController extends Controller
             'image'     => $imageName,
         ]);
 
-        if ($attachment) $handleFilesService->storeAttachmentWithRelationship($attachment, $toDo);
+        if ($attachment) $handleFilesService->storeAttachment($attachment, $toDo);
 
         return $this->apiResponse($this->getToDos($user));
     }
@@ -103,11 +127,7 @@ class ToDoController extends Controller
         DeleteToDo $request,
         HandleFilesContract $handleFilesService
     ): JsonResponse {
-        $handleFilesService->removeExistingUploadsAndRelationships(
-            $toDo,
-            (bool) $toDo->image,
-            $toDo->attachment()->exists()
-        );
+        $this->cleanUpFiles($toDo, $handleFilesService);
 
         $toDo->delete();
 
@@ -166,5 +186,26 @@ class ToDoController extends Controller
         return $request->get('remindAt') ?
             $this->createRemindAtTimeStamp($request->get('remindAt'), $request->get('remindAtTime')) :
             null;
+    }
+
+    /**
+     * @param \App\ToDo                               $toDo
+     * @param \App\Http\Contracts\HandleFilesContract $handleFilesService
+     */
+    protected function cleanUpFiles(ToDo $toDo, HandleFilesContract $handleFilesService): void
+    {
+        if ($toDo->image) {
+            $handleFilesService->removeFile(
+                $toDo,
+                ToDo::IMAGE
+            );
+        }
+
+        if ($toDo->attachment) {
+            $handleFilesService->removeFile(
+                $toDo,
+                ToDo::ATTACHMENT
+            );
+        }
     }
 }

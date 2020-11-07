@@ -4,7 +4,6 @@ namespace App\Http\Services;
 
 use App\Attachment;
 use App\Http\Contracts\HandleFilesContract;
-use App\Http\Requests\ToDos\UpdateToDo;
 use App\ToDo;
 use App\User;
 use Illuminate\Http\UploadedFile;
@@ -16,22 +15,20 @@ class HandleFilesService implements HandleFilesContract
     /**
      * @param \Illuminate\Http\UploadedFile $attachment
      * @param \App\ToDo                     $toDo
+     *
+     * @return string
      */
-    public function storeAttachmentWithRelationship(UploadedFile $attachment, ToDo $toDo): void
+    public function storeAttachment(UploadedFile $attachment, ToDo $toDo): string
     {
         $storageName = $this->getUploadName(
             $attachment->getClientOriginalName(),
             $attachment->getClientOriginalExtension(),
             $toDo->user->id
         );
-        $storagePath = Storage::putFileAs(Attachment::ATTACHMENT_FILE_PATH, $attachment, $storageName);
-        $attachmentDisplayPath = str_replace('public', '', $storagePath);
 
-        Attachment::create([
-            'to_do_id'     => $toDo->id,
-            'display_name' => $attachment->getClientOriginalName(),
-            'file_path'    => $attachmentDisplayPath,
-        ]);
+        $storagePath = Storage::putFileAs(Attachment::ATTACHMENT_FILE_PATH, $attachment, $storageName);
+
+        return str_replace('public', '', $storagePath);
     }
 
     /**
@@ -55,34 +52,22 @@ class HandleFilesService implements HandleFilesContract
 
     /**
      * @param \App\ToDo $toDo
-     * @param bool      $shouldDeleteImage
-     * @param bool      $shouldDeleteAttachment
+     * @param string    $type
      *
      * @throws \Exception
      */
-    public function removeExistingUploadsAndRelationships(
-        ToDo $toDo,
-        bool $shouldDeleteImage,
-        bool $shouldDeleteAttachment
-    ): void {
-        if (
-            $shouldDeleteImage &&
-            $toDo->image &&
-            $this->isNotATestFile($toDo->image)
-        ) {
-            $this->removeUpload(
+    public function removeFile(ToDo $toDo, string $type): void
+    {
+        if ($type === ToDo::IMAGE && $this->isNotATestFile($toDo->image)) {
+            $this->deleteFile(
                 ToDo::IMAGE_DISPLAY_PATH,
                 $toDo->image,
                 ToDo::IMAGE_FILE_PATH
             );
         }
 
-        if (
-            $shouldDeleteAttachment &&
-            $toDo->attachment &&
-            $this->isNotATestFile($toDo->attachment->file_path)
-        ) {
-            $this->removeUpload(
+        if ($type === ToDo::ATTACHMENT && $this->isNotATestFile($toDo->attachment->file_path)) {
+            $this->deleteFile(
                 ToDo::ATTACHMENT_DISPLAY_PATH,
                 $toDo->attachment->file_path,
                 ToDo::ATTACHMENT_FILE_PATH
@@ -98,31 +83,11 @@ class HandleFilesService implements HandleFilesContract
      *
      * @param string $filePath
      */
-    public function removeUpload(string $displayPath, string $fileLocation, string $filePath): void
+    protected function deleteFile(string $displayPath, string $fileLocation, string $filePath): void
     {
         $file = $filePath.'/'.str_replace($displayPath, '', $fileLocation);
 
         Storage::delete($file);
-    }
-
-    /**
-     * @param \App\ToDo                               $toDo
-     * @param \App\Http\Requests\ToDos\UpdateToDo     $request
-     *
-     * @throws \Exception
-     * @return array
-     */
-    public function clearStorageForNewUploadsOrOnRequestByUser(ToDo $toDo, UpdateToDo $request): array
-    {
-        $image = $request->file('image');
-        $attachment = $request->file('attachment');
-
-        $shouldDeleteExistingImage = (bool)$image || $request->get('deleteImage');
-        $shouldDeleteExistingAttachment = (bool)$attachment || $request->get('deleteAttachment');
-
-        $this->removeExistingUploadsAndRelationships($toDo, $shouldDeleteExistingImage, $shouldDeleteExistingAttachment);
-
-        return array($image, $attachment);
     }
 
     /**
@@ -132,7 +97,7 @@ class HandleFilesService implements HandleFilesContract
      *
      * @return string
      */
-    public function getUploadName(string $filename, string $extension, int $userId): string
+    protected function getUploadName(string $filename, string $extension, int $userId): string
     {
         return md5($filename.$userId).'.'.$extension;
     }

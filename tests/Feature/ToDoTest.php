@@ -251,7 +251,7 @@ class ToDoTest extends TestCase
         Storage::disk('local')->assertMissing('public/images/'.md5('image.png'.$this->user->id).'.png');
     }
 
-    public function testImageIsRemovedWhenWhenUserDeletesImage()
+    public function testImageIsRemovedWhenUserDeletesImage()
     {
         Storage::fake('local');
 
@@ -289,7 +289,7 @@ class ToDoTest extends TestCase
         Storage::disk('local')->assertMissing('public/attachments/'.md5('file.pdf'.$this->user->id).'.pdf');
     }
 
-    public function testAttachmentIsRemovedWhenWhenUserDeletesAttachment()
+    public function testAttachmentIsRemovedWhenUserDeletesAttachment()
     {
         Storage::fake('local');
 

@@ -26,6 +26,9 @@ class ToDo extends Model implements Arrayable
     const ATTACHMENT_FILE_PATH = 'public/attachments';
     const IMAGE_FILE_PATH = '/public/images';
     const IMAGE_DISPLAY_PATH = '/images/';
+    const ATTACHMENT = 'attachment';
+    const IMAGE = 'image';
+
     const RULES = [
         'attachment'   => 'nullable|file|max:4096',
         'body'         => 'nullable|string',
