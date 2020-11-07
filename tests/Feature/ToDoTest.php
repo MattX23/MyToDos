@@ -113,7 +113,7 @@ class ToDoTest extends TestCase
 
         $response
             ->assertSessionHasErrors('attachment')
-            ->assertStatus(302);
+            ->assertStatus(Response::HTTP_FOUND);
     }
 
     public function testStoreToDoWithImage()
@@ -149,7 +149,7 @@ class ToDoTest extends TestCase
 
         $response
             ->assertSessionHasErrors('image')
-            ->assertStatus(302);
+            ->assertStatus(Response::HTTP_FOUND);
     }
 
     public function testStoreWithDueDateInPast()
@@ -161,7 +161,7 @@ class ToDoTest extends TestCase
 
         $response
             ->assertSessionHasErrors('dueDate')
-            ->assertStatus(302);
+            ->assertStatus(Response::HTTP_FOUND);
     }
 
     public function testStoreWithRemindAtAfterDueDate()
@@ -175,7 +175,7 @@ class ToDoTest extends TestCase
 
         $response
             ->assertSessionHasErrors('remindAt')
-            ->assertStatus(302);
+            ->assertStatus(Response::HTTP_FOUND);
     }
 
     public function testStoreWithReminderBeforeDueDate()
@@ -188,7 +188,7 @@ class ToDoTest extends TestCase
 
         $response
             ->assertSessionHasErrors( 'remindAt')
-            ->assertStatus(302);
+            ->assertStatus(Response::HTTP_FOUND);
     }
 
     public function testEditToDo()
@@ -221,7 +221,7 @@ class ToDoTest extends TestCase
             'body'     => 'A new To Do body',
         ]);
 
-        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     public function testImageIsRemovedWhenNewImageUploaded()
@@ -312,7 +312,7 @@ class ToDoTest extends TestCase
 
         $response = $this->delete( '/api/delete-to-do/'.$toDo->id.'/'.$this->user->id);
 
-        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     public function testUserCannotAccessAnotherUsersToDo()
@@ -321,7 +321,7 @@ class ToDoTest extends TestCase
 
         $response = $this->get( '/api/get-to-dos/'.$newUser->id);
 
-        $response->assertStatus(RESPONSE::HTTP_FORBIDDEN);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     public function testMarkToDoAsComplete()
