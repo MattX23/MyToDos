@@ -22,3 +22,15 @@ Users are also able to opt-in to email reminders when a due date is set on a To 
 - To run tests: `vendor/bin/phpunit`
 
 ## Screenshots
+
+### Main Screen
+
+![Main Screen](storage/app/public/screenshots/Main_Screen.png?raw=true)
+
+### Add To Do
+
+![Main Screen](storage/app/public/screenshots/Add_To_Do.png?raw=true)
+
+### View To Do
+
+![Main Screen](storage/app/public/screenshots/View_To_do.png?raw=true)
