@@ -29,8 +29,8 @@ Users are also able to opt-in to email reminders when a due date is set on a To 
 
 ### Add To Do
 
-![Main Screen](storage/app/public/screenshots/Add_To_Do.png?raw=true)
+![Add To Do](storage/app/public/screenshots/Add_To_Do.png?raw=true)
 
 ### View To Do
 
-![Main Screen](storage/app/public/screenshots/View_To_do.png?raw=true)
+![View To Do](storage/app/public/screenshots/View_To_Do.png?raw=true)
