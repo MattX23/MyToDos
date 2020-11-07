@@ -37,6 +37,7 @@ class SendReminder extends Mailable implements ShouldQueue
     {
         return $this
             ->from(Config::get('mail.from.reminders'))
+            ->subject('Your To Do Reminder')
             ->markdown('emails.reminders')
             ->withToDo($this->toDo)
             ->withTimeUntilDue($this->timeUntilDue)
