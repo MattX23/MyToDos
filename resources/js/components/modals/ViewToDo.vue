@@ -1,17 +1,16 @@
 <template>
     <div
         :class="{ 'is-active' : isActive }"
-        class="modal"
-        aria-labelledby=""
         aria-hidden="true"
+        class="modal"
         id="view-modal"
         role="dialog"
         tabindex="-1"
     >
-        <div v-if="todo" class="modal-dialog modal-dialog-centered" role="document">
+        <div v-if="toDo" class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">{{ todo.title }}</h5>
+                    <h5 class="modal-title">{{ toDo.title }}</h5>
                     <button @click="closeModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -19,16 +18,18 @@
                 <div class="modal-body">
                     <div class="modal-body-content">
                         <div class="row">
-                            <div v-if="todo.image" class="col-12 text-center">
-                                <img class="todo-image round-image modal-header-image" :src="todo.image" alt="">
+                            <div v-if="toDo.image" class="col-12 text-center">
+                                <img class="todo-image round-image modal-header-image" :src="toDo.image" alt="">
                                 <hr>
                             </div>
                             <div v-else class="col-12 text-center">
-                                <div class="image-placeholder round-image modal-header-image">{{ todo.title.substring(0, 1) }}</div>
+                                <div class="image-placeholder round-image modal-header-image">
+                                    {{ toDo.title.substring(0, 1) }}
+                                </div>
                                 <hr>
                             </div>
                         </div>
-                        <div v-show="todo.body" class="row">
+                        <div v-show="toDo.body" class="row">
                             <div class="col-12">
                                 <div class="row margin-btm-sm">
                                     <div class="col-3 label">
@@ -36,14 +37,14 @@
                                     </div>
                                     <div class="col-9">
                                         <p id="details">
-                                            {{ todo.body }}
+                                            {{ toDo.body }}
                                         </p>
                                     </div>
                                 </div>
                                 <hr>
                             </div>
                         </div>
-                        <div v-if="todo.attachment" class="row">
+                        <div v-if="toDo.attachment" class="row">
                             <div class="col-12">
                                 <div class="row margin-btm-sm">
                                     <div class="col-3 label">
@@ -51,7 +52,9 @@
                                     </div>
                                     <div class="col-9">
                                         <p id="attachment">
-                                            <a :href="todo.attachment.file_path" target="_blank" title="Download">{{ todo.attachment.display_name }}</a>
+                                            <a :href="toDo.attachment.file_path" target="_blank" title="Download">
+                                                {{ toDo.attachment.display_name }}
+                                            </a>
                                         </p>
                                     </div>
                                 </div>
@@ -59,7 +62,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div v-show="!todo.is_complete" class="col-12">
+                            <div v-show="!toDo.is_complete" class="col-12">
                                 <div class="row">
                                     <div class="col-sm-5">
                                         <div class="row margin-btm-sm">
@@ -67,8 +70,8 @@
                                                 <label for="due_date"><i class="zmdi zmdi-calendar"></i> Due:</label>
                                             </div>
                                             <div class="col-7">
-                                                <p v-if="todo.due_date" id="due_date">
-                                                    {{ getDateInDayMonthFormat(todo.due_date) }}
+                                                <p v-if="toDo.due_date" id="due_date">
+                                                    {{ getDateInDayMonthFormat(toDo.due_date) }}
                                                 </p>
                                                 <p v-else>
                                                     Not set.
@@ -82,8 +85,8 @@
                                                 <label for="remind_at"><i class="zmdi zmdi-time"></i> Reminder:</label>
                                             </div>
                                             <div class="col-6">
-                                                <p v-if="todo.remind_at" id="remind_at">
-                                                    {{ getDateInDayMonthFormat(todo.remind_at) }} ({{ todo.remind_at_time }}:00)
+                                                <p v-if="toDo.remind_at" id="remind_at">
+                                                    {{ getDateInDayMonthFormat(toDo.remind_at) }} ({{ toDo.remind_at_time }}:00)
                                                 </p>
                                                 <p v-else>
                                                     Not set.
@@ -115,7 +118,7 @@ export default {
         userId: {
             type: Number,
         },
-        todo: {
+        toDo: {
             type: Object,
         },
     },
